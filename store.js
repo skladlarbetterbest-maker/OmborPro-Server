@@ -109,6 +109,85 @@ async function initTables() {
     )
   `);
   await query(`CREATE TABLE IF NOT EXISTS settings (key VARCHAR(100) PRIMARY KEY, value TEXT)`);
+  await query(`
+    CREATE TABLE IF NOT EXISTS inv_links (
+      id VARCHAR(50) PRIMARY KEY,
+      token VARCHAR(100) UNIQUE,
+      obyekt VARCHAR(100),
+      operator VARCHAR(100),
+      status VARCHAR(20) DEFAULT 'jarayonda',
+      sana VARCHAR(20),
+      vaqt VARCHAR(20),
+      diffs JSONB,
+      yakunlangan_vaqt VARCHAR(20),
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS transfers (
+      id VARCHAR(50) PRIMARY KEY,
+      sana VARCHAR(20),
+      kimdan VARCHAR(100),
+      kimga VARCHAR(100),
+      mahsulot VARCHAR(255),
+      miqdor DECIMAL(15,2),
+      operator VARCHAR(100),
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS inventarizatsiya (
+      id VARCHAR(50) PRIMARY KEY,
+      sana VARCHAR(20),
+      obyekt VARCHAR(100),
+      operator VARCHAR(100),
+      data JSONB,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS min_stock (
+      product_name VARCHAR(255) PRIMARY KEY,
+      min_qty DECIMAL(15,2),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS debtors (
+      id VARCHAR(50) PRIMARY KEY,
+      name VARCHAR(255),
+      phone VARCHAR(50),
+      address TEXT,
+      summa DECIMAL(15,2),
+      izoh TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS creditors (
+      id VARCHAR(50) PRIMARY KEY,
+      name VARCHAR(255),
+      phone VARCHAR(50),
+      address TEXT,
+      summa DECIMAL(15,2),
+      izoh TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id VARCHAR(50) PRIMARY KEY,
+      sana VARCHAR(20),
+      tur VARCHAR(20),
+      name VARCHAR(255),
+      summa DECIMAL(15,2),
+      izoh TEXT,
+      operator VARCHAR(100),
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
 
   const users = await query('SELECT * FROM users WHERE login = $1', ['jamoliddin']);
   if (users.rows.length === 0) {
