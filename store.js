@@ -76,10 +76,12 @@ async function initTables() {
       miqdor DECIMAL(15,2),
       narx DECIMAL(15,2),
       summa DECIMAL(15,2),
+      tomon VARCHAR(255),
       obyekt VARCHAR(100),
       izoh TEXT,
       operator VARCHAR(100),
       changed_by VARCHAR(100),
+      timestamp TIMESTAMP DEFAULT NOW(),
       changed_at TIMESTAMP DEFAULT NOW()
     )
   `);
