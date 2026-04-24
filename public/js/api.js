@@ -3,7 +3,7 @@
  */
 const API = {
   token: localStorage.getItem('token') || '',
-  baseUrl: 'http://localhost:3000',
+  baseUrl: 'https://omborpro-server-1.onrender.com',
 
   headers() {
     const h = { 'Content-Type': 'application/json' };
