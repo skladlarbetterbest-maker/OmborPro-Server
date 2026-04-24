@@ -47,12 +47,27 @@ const KirimChiqim = {
         <div class="autocomplete-dropdown" id="dropdown-${rid}"></div>
       </div>
       <div><div class="f-label">${App.t('olchov')}</div><input class="f-input prod-unit" readonly style="background:rgba(31,41,55,0.4)"></div>
-      <div><div class="f-label">${App.t('miqdor')}</div><input class="f-input prod-qty" placeholder="0" oninput="this.value=Utils.formatInputNumber(this.value);KirimChiqim.calcRowSum('${rid}','${type}')"></div>
-      <div><div class="f-label">${App.t('narx')}</div><input class="f-input prod-price" placeholder="0" oninput="this.value=Utils.formatInputNumber(this.value);KirimChiqim.calcRowSum('${rid}','${type}')"></div>
-      <div><div class="f-label">${App.t('summa')}</div><input class="f-input prod-sum" placeholder="0" readonly style="background:rgba(31,41,55,0.4);color:var(--text)"></div>
+      <div><div class="f-label">${App.t('miqdor')}</div><input class="f-input prod-qty" type="text" inputmode="decimal" placeholder="0" oninput="KirimChiqim.onNumberInput(this); KirimChiqim.calcRowSum('${rid}','${type}')"></div>
+      <div><div class="f-label">${App.t('narx')}</div><input class="f-input prod-price" type="text" inputmode="decimal" placeholder="0" oninput="KirimChiqim.onNumberInput(this); KirimChiqim.calcRowSum('${rid}','${type}')"></div>
+      <div><div class="f-label">${App.t('summa')}</div><input class="f-input prod-sum" type="text" placeholder="0" readonly style="background:rgba(31,41,55,0.4);color:var(--text)"></div>
       <div><div class="f-label">&nbsp;</div><button class="btn btn-red btn-sm" onclick="KirimChiqim.removeRow('${rid}','${type}')" style="padding:10px 12px;font-size:14px">✕</button></div>
     `;
     container.appendChild(div);
+  },
+
+  onNumberInput(input) {
+    // Faqat raqamlar, nuqta va vergulni qabul qilish
+    let value = input.value;
+    // Vergulni nuqtaga almashtirish
+    value = value.replace(/,/g, '.');
+    // Faqat raqamlar va bitta nuqtani qoldirish
+    value = value.replace(/[^0-9.]/g, '');
+    // Bir nechta nuqtani oldini olish
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    input.value = value;
   },
 
   removeRow(rid, type) {
@@ -119,8 +134,8 @@ const KirimChiqim = {
   calcRowSum(rid, type) {
     const row = document.getElementById(rid);
     if (!row) return;
-    const qty = parseFloat(row.querySelector('.prod-qty').value.replace(/\./g,'')) || 0;
-    const price = parseFloat(row.querySelector('.prod-price').value.replace(/\./g,'')) || 0;
+    const qty = parseFloat(row.querySelector('.prod-qty').value.replace(/,/g,'.')) || 0;
+    const price = parseFloat(row.querySelector('.prod-price').value.replace(/,/g,'.')) || 0;
     const sum = qty * price;
     row.querySelector('.prod-sum').value = sum > 0 ? Utils.formatNumber(sum) : '';
     this.calcTotal(type);
@@ -130,7 +145,7 @@ const KirimChiqim = {
     const container = document.getElementById(type + '-rows');
     let total = 0;
     container.querySelectorAll('.dynamic-row').forEach(row => {
-      total += parseFloat(row.querySelector('.prod-sum').value.replace(/\./g,'')) || 0;
+      total += parseFloat(row.querySelector('.prod-sum').value.replace(/,/g,'.')) || 0;
     });
     document.getElementById((type==='kirim'?'k':'c') + '-jami-summa').textContent = Utils.formatNumber(total);
   },
@@ -167,9 +182,9 @@ const KirimChiqim = {
 
     rows.forEach(r => {
       const mahsulot = r.querySelector('.prod-name').value.trim();
-      const miqdor = parseFloat(r.querySelector('.prod-qty').value.replace(/\./g,'')) || 0;
-      const narx = parseFloat(r.querySelector('.prod-price').value.replace(/\./g,'')) || 0;
-      
+      const miqdor = parseFloat(r.querySelector('.prod-qty').value.replace(/,/g,'.')) || 0;
+      const narx = parseFloat(r.querySelector('.prod-price').value.replace(/,/g,'.')) || 0;
+
       if (mahsulot) {
         const prodExists = katalog.find(k => k.nom.toLowerCase() === mahsulot.toLowerCase());
         if (!prodExists) invalidProduct = mahsulot;
@@ -208,9 +223,9 @@ const KirimChiqim = {
 
     rows.forEach(r => {
       const mahsulot = r.querySelector('.prod-name').value.trim();
-      const miqdor = parseFloat(r.querySelector('.prod-qty').value.replace(/\./g,'')) || 0;
-      const narx = parseFloat(r.querySelector('.prod-price').value.replace(/\./g,'')) || 0;
-      
+      const miqdor = parseFloat(r.querySelector('.prod-qty').value.replace(/,/g,'.')) || 0;
+      const narx = parseFloat(r.querySelector('.prod-price').value.replace(/,/g,'.')) || 0;
+
       if (mahsulot) {
         const prodExists = katalog.find(k => k.nom.toLowerCase() === mahsulot.toLowerCase());
         if (!prodExists) invalidProduct = mahsulot;

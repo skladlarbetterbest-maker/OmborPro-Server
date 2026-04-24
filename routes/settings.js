@@ -2,7 +2,7 @@
  * Settings routes — Sozlamalar, Obyektlar, Omborlar
  */
 const router = require('express').Router();
-const { authMiddleware, adminOnly } = require('../middleware/auth');
+const { authMiddleware, adminOnly, ownerOnly } = require('../middleware/auth');
 const store = require('../store');
 
 // GET /api/settings
@@ -70,7 +70,7 @@ router.post('/min-stock', authMiddleware, async (req, res) => {
 });
 
 // ── Firms ──
-router.post('/firms', authMiddleware, adminOnly, async (req, res) => {
+router.post('/firms', authMiddleware, ownerOnly, async (req, res) => {
   const { name, inn, telegram, phone, address, note, oldName } = req.body;
   if (!name) return res.status(400).json({ ok: false, error: 'Firma nomi kerak' });
   const result = await store.upsertFirm(name, { inn: inn || '', telegram: telegram || '', phone: phone || '', address: address || '', note: note || '', oldName });

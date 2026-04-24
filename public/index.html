@@ -244,7 +244,7 @@
                                 <div class="f-label" data-i18n="qaysiFirmadan">1. Qaysi firmadan (Yetkazib beruvchi)</div>
                                 <div style="display:flex;gap:8px">
                                     <input class="f-input" id="k-yetkazuvchi" placeholder="Kompaniya nomi" list="firms-list" style="margin-bottom:0;flex:1">
-                                    <button class="btn btn-outline admin-only" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="document.getElementById('kirim-new-firm-form').style.display='block'">➕</button>
+                                    <button class="btn btn-outline owner-only" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="document.getElementById('kirim-new-firm-form').style.display='block'">➕</button>
                                 </div>
                                 <div id="kirim-new-firm-form" style="display:none; background:rgba(30,41,59,0.5); padding:16px; border-radius:8px; margin-top:8px; border:1px solid var(--border)">
                                     <div style="font-size:12px; font-weight:bold; margin-bottom:12px; color:var(--accent-light)">Yangi firma qo'shish</div>
@@ -437,7 +437,7 @@
                                     <div class="autocomplete-dropdown" id="dropdown-trf"></div>
                                 </div>
                                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                            <div><div class="f-label">Miqdor</div><input class="f-input" id="trf-qty" placeholder="0" type="number"></div>
+                            <div><div class="f-label">Miqdor</div><input class="f-input" id="trf-qty" placeholder="0" type="text" inputmode="decimal" oninput="App.onNumberInput(this)"></div>
                             <div><div class="f-label">Izoh</div><input class="f-input" id="trf-note" placeholder="Ixtiyoriy..."></div>
                         </div>
                         <button class="btn btn-primary btn-full mt-16" onclick="Warehouse.doTransfer()">TRANSFER QILISH</button>
@@ -509,9 +509,9 @@
                         <div class="resize-handle" id="inventar-resize-handle"></div>
 
                         <!-- RIGHT: Links + History -->
-                        <div class="inventar-right-panel" style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:12px;">
+                        <div class="inventar-right-panel" style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:0;">
                             <!-- Mobile Link Card -->
-                            <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+                            <div class="card inv-top-card" style="flex:1; display:flex; flex-direction:column; min-height:100px; margin-bottom:6px;">
                                 <div class="card-header">
                                     <div>
                                         <div class="card-title">📱 Telefon Linki</div>
@@ -556,8 +556,10 @@
                                 </div>
                             </div>
 
+                            <div class="resize-handle-h" id="inv-right-resize-handle"></div>
+
                             <!-- History Card -->
-                            <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+                            <div class="card inv-bottom-card" style="flex:1; display:flex; flex-direction:column; min-height:100px; margin-top:6px;">
                                 <div class="card-header">
                                     <div>
                                         <div class="card-title">🗂️ Inventarizatsiya Tarixi</div>
@@ -691,7 +693,7 @@
                                 <button class="btn btn-outline" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="App.promptNewFirm('dbt-firma')">➕</button>
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                                <div><div class="f-label">Summa</div><input class="f-input" id="dbt-summa" placeholder="0" type="number"></div>
+                                <div><div class="f-label">Summa</div><input class="f-input" id="dbt-summa" placeholder="0" type="text" inputmode="decimal" oninput="App.onNumberInput(this)"></div>
                                 <div><div class="f-label">Muddati</div><input class="f-input" id="dbt-muddati" type="date"></div>
                             </div>
                             <div class="f-label">Izoh</div><input class="f-input" id="dbt-izoh" placeholder="Ixtiyoriy...">
@@ -707,7 +709,7 @@
                                 <button class="btn btn-outline" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="App.promptNewFirm('crd-firma')">➕</button>
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                                <div><div class="f-label">Summa</div><input class="f-input" id="crd-summa" placeholder="0" type="number"></div>
+                                <div><div class="f-label">Summa</div><input class="f-input" id="crd-summa" placeholder="0" type="text" inputmode="decimal" oninput="App.onNumberInput(this)"></div>
                                 <div><div class="f-label">Muddati</div><input class="f-input" id="crd-muddati" type="date"></div>
                             </div>
                             <div class="f-label">Izoh</div><input class="f-input" id="crd-izoh" placeholder="Ixtiyoriy...">
@@ -788,8 +790,12 @@
                                 <option value="Barchasi" data-i18n="barchasi">Barchasi</option>
                             </select>
                         </div>
-                        <div style="display:flex; gap:8px; margin-bottom:16px">
+                        <div style="display:flex; gap:8px; margin-bottom:16px; align-items:center;">
                             <input class="f-input" id="minq-search" placeholder="Mahsulot qidirish..." data-i18n="mahsulotQidirish" style="margin-bottom:0; flex:1;" oninput="MinQoldiq.render()">
+                            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding: 0 8px;">
+                                <input type="checkbox" id="minq-only-red" onchange="MinQoldiq.render()" style="width:auto; margin:0;">
+                                <span style="color:var(--red); font-weight:600;">Faqat kamayganlar</span>
+                            </label>
                         </div>
                         <div id="minq-list" style="display:flex; flex-direction:column; gap:8px;"></div>
                     </div>

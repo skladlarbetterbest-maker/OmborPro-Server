@@ -544,5 +544,66 @@ const Warehouse = {
         document.body.style.userSelect = '';
       }
     });
+
+    // --- Right Panel Horizontal Resize Handle ---
+    const handleH = document.getElementById('inv-right-resize-handle');
+    const topCard = document.querySelector('.inv-top-card');
+    const bottomCard = document.querySelector('.inv-bottom-card');
+
+    if (!handleH || !topCard || !bottomCard) return;
+
+    let isResizingH = false;
+    let startY = 0;
+    let startTopHeight = 0;
+    let startBottomHeight = 0;
+
+    handleH.addEventListener('mousedown', (e) => {
+      isResizingH = true;
+      startY = e.clientY;
+      startTopHeight = topCard.offsetHeight;
+      startBottomHeight = bottomCard.offsetHeight;
+      handleH.classList.add('active');
+      document.body.style.cursor = 'row-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizingH) return;
+
+      const deltaY = e.clientY - startY;
+      const rightPanel = document.querySelector('.inventar-right-panel');
+      const containerHeight = rightPanel.offsetHeight;
+      const gapH = 12; // margins
+
+      let newTopHeight = startTopHeight + deltaY;
+      let newBottomHeight = startBottomHeight - deltaY;
+
+      const minHeight = 100;
+      if (newTopHeight < minHeight) {
+        newTopHeight = minHeight;
+        newBottomHeight = containerHeight - gapH - minHeight;
+      }
+      if (newBottomHeight < minHeight) {
+        newBottomHeight = minHeight;
+        newTopHeight = containerHeight - gapH - minHeight;
+      }
+
+      const totalHeight = newTopHeight + newBottomHeight + gapH;
+      const topFlex = newTopHeight / totalHeight;
+      const bottomFlex = newBottomHeight / totalHeight;
+
+      topCard.style.flex = topFlex.toFixed(4);
+      bottomCard.style.flex = bottomFlex.toFixed(4);
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isResizingH) {
+        isResizingH = false;
+        handleH.classList.remove('active');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
   }
 };

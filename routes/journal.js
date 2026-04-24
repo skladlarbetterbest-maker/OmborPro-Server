@@ -9,8 +9,12 @@ const store = require('../store');
 router.get('/', authMiddleware, async (req, res) => {
   const users = await store.getUsers();
   const userData = users[req.user.login] || {};
-  const userObyekt = userData.obyekt || 'Barchasi';
-  const isAdmin = req.user.role === 'admin';
+  let userObyekt = userData.obyekt || 'Barchasi';
+  // Array bo'lsa stringga aylantirish
+  if (Array.isArray(userObyekt)) {
+    userObyekt = userObyekt.includes('Barchasi') ? 'Barchasi' : userObyekt[0] || 'Barchasi';
+  }
+  const isAdmin = req.user.role === 'admin' || req.user.role === 'owner';
 
   let jurnal = await store.getJurnal();
 
@@ -29,8 +33,12 @@ router.post('/', authMiddleware, async (req, res) => {
 
     const users = await store.getUsers();
     const userData = users[req.user.login] || {};
-    const userObyekt = userData.obyekt || 'Barchasi';
-    const isAdmin = req.user.role === 'admin';
+    let userObyekt = userData.obyekt || 'Barchasi';
+    // Array bo'lsa stringga aylantirish
+    if (Array.isArray(userObyekt)) {
+      userObyekt = userObyekt.includes('Barchasi') ? 'Barchasi' : userObyekt[0] || 'Barchasi';
+    }
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'owner';
 
     let targetObyekt = store.clean(obyekt || 'Barchasi');
     if (!isAdmin && userObyekt !== 'Barchasi' && targetObyekt !== userObyekt) {
@@ -149,8 +157,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     const users = await store.getUsers();
     const userData = users[req.user.login] || {};
-    const userObyekt = userData.obyekt || 'Barchasi';
-    const isAdmin = req.user.role === 'admin';
+    let userObyekt = userData.obyekt || 'Barchasi';
+    // Array bo'lsa stringga aylantirish
+    if (Array.isArray(userObyekt)) {
+      userObyekt = userObyekt.includes('Barchasi') ? 'Barchasi' : userObyekt[0] || 'Barchasi';
+    }
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'owner';
     const recordObyekt = jurnal[index].obyekt || 'Barchasi';
 
     if (!isAdmin && userObyekt !== 'Barchasi' && recordObyekt !== userObyekt) {
@@ -190,8 +202,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
     const users = await store.getUsers();
     const userData = users[req.user.login] || {};
-    const userObyekt = userData.obyekt || 'Barchasi';
-    const isAdmin = req.user.role === 'admin';
+    let userObyekt = userData.obyekt || 'Barchasi';
+    // Array bo'lsa stringga aylantirish
+    if (Array.isArray(userObyekt)) {
+      userObyekt = userObyekt.includes('Barchasi') ? 'Barchasi' : userObyekt[0] || 'Barchasi';
+    }
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'owner';
     const recordObyekt = record.obyekt || 'Barchasi';
 
     if (!isAdmin && userObyekt !== 'Barchasi' && recordObyekt !== userObyekt) {
@@ -224,8 +240,12 @@ router.post('/restore/:historyIndex', authMiddleware, async (req, res) => {
 
     const users = await store.getUsers();
     const userData = users[req.user.login] || {};
-    const userObyekt = userData.obyekt || 'Barchasi';
-    const isAdmin = req.user.role === 'admin';
+    let userObyekt = userData.obyekt || 'Barchasi';
+    // Array bo'lsa stringga aylantirish
+    if (Array.isArray(userObyekt)) {
+      userObyekt = userObyekt.includes('Barchasi') ? 'Barchasi' : userObyekt[0] || 'Barchasi';
+    }
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'owner';
     const entryObyekt = history[histIdx].obyekt || 'Barchasi';
 
     if (!isAdmin && userObyekt !== 'Barchasi' && entryObyekt !== userObyekt) {

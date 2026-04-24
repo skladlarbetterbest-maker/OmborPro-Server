@@ -89,9 +89,9 @@ router.post('/inventarizatsiya', authMiddleware, async (req, res) => {
   const users = await store.getUsers();
   const userData = users[req.user.login] || {};
   const userObyekt = userData.obyekt || 'Barchasi';
-  const isAdmin = req.user.role === 'admin';
-  
-  if (!isAdmin && userObyekt !== 'Barchasi' && obyekt !== userObyekt) {
+  const isAdmin = req.user.role === 'admin' || req.user.role === 'owner';
+
+  if (!isAdmin && !userObyekt.includes('Barchasi') && !userObyekt.includes(obyekt)) {
     return res.status(403).json({ ok: false, error: 'Siz faqat o\'z obyektingizda inventarizatsiya qilishingiz mumkin' });
   }
 
@@ -174,15 +174,15 @@ router.post('/inventarizatsiya', authMiddleware, async (req, res) => {
 });
 
 // DELETE /api/warehouse/inventarizatsiya/:id - inventarizatsiyani o'chirish (faqat admin)
-router.delete('/inventarizatsiya/:id', authMiddleware, (req, res) => {
+router.delete('/inventarizatsiya/:id', authMiddleware, async (req, res) => {
   try {
-    // Faqat admin o'chira oladi
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ ok: false, error: 'Faqat admin o\'chira oladi' });
+    // Faqat admin yoki owner o'chira oladi
+    if (req.user.role !== 'admin' && req.user.role !== 'owner') {
+      return res.status(403).json({ ok: false, error: 'Faqat admin yoki owner o\'chira oladi' });
     }
     
     const id = req.params.id;
-    const deleted = store.deleteInventarizatsiya(id);
+    const deleted = await store.deleteInventarizatsiya(id);
     if (!deleted) {
       return res.status(404).json({ ok: false, error: 'Topilmadi' });
     }

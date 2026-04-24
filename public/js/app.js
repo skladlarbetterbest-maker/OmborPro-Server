@@ -154,7 +154,8 @@ const App = {
   updateHeaderBadge(role) {
     const el = document.getElementById('header-tier-badge');
     el.className = 'header-premium-badge';
-    if (role === 'admin') { el.classList.add('badge-admin-tag'); el.textContent = '👑 ADMIN'; }
+    if (role === 'owner') { el.classList.add('badge-admin-tag'); el.textContent = '👑 OWNER'; }
+    else if (role === 'admin') { el.classList.add('badge-admin-tag'); el.textContent = '👑 ADMIN'; }
     else if (role === 'pro+') { el.classList.add('badge-proplus-tag'); el.textContent = '💎 PRO+'; }
     else if (role === 'pro') { el.classList.add('badge-pro'); el.textContent = '⭐ PRO'; }
     else { el.classList.add('badge-free'); el.textContent = 'FREE'; }
@@ -352,6 +353,7 @@ const App = {
     // Update admin-only element visibility
     const role = this.getUserRole();
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = role === 'admin' ? '' : 'none');
+    document.querySelectorAll('.owner-only').forEach(el => el.style.display = role === 'owner' ? '' : 'none');
 
     const titles = {
       dashboard:'Dashboard', kirim:'Kirim / Chiqim', qoldiq:'Qoldiq', jurnal:'Jurnal', tarix:'Tarix',
@@ -599,6 +601,17 @@ const App = {
     } else {
       alert("Xatolik: " + res.error);
     }
+  },
+
+  onNumberInput(input) {
+    let value = input.value;
+    value = value.replace(/,/g, '.');
+    value = value.replace(/[^0-9.]/g, '');
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    input.value = value;
   }
 };
 

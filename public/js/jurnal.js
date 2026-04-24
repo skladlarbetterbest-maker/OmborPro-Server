@@ -57,35 +57,45 @@ const Jurnal = {
         <td onclick="event.stopPropagation()"><span class="toggle-icon ${exp ? 'open' : ''}">▶️</span></td>
       </tr>`;
       if (exp) {
-        // Guruh darajasida Tahrirlash va O'chirish knopkalari
-        html += `<tr style="background: rgba(99, 102, 241, 0.08)">
-          <td colspan="10" style="padding: 12px 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div style="font-size: 12px; color: var(--text-secondary);">
-                <strong>${g.tomon || '—'}</strong> - ${g.items.length} ta mahsulot
+        html += `<tr>
+          <td colspan="10" style="padding: 0; border: none;">
+            <div style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; margin: 8px 16px; padding: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 12px;">
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                  <strong>${g.tomon || '—'}</strong> - ${g.items.length} ta mahsulot
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="Jurnal.editGroup('${g.key}')" style="padding: 6px 12px; font-size: 11px;">Tahrirlash</button>` : ''}
+                  ${canDelete ? `<button class="btn btn-sm btn-outline" onclick="Jurnal.deleteGroup('${g.key}')" style="padding: 6px 12px; font-size: 11px; color: var(--red); border-color: var(--red);">O'chirish</button>` : ''}
+                </div>
               </div>
-              <div style="display: flex; gap: 8px;">
-                ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="Jurnal.editGroup('${g.key}')" style="padding: 6px 12px; font-size: 11px;">Tahrirlash</button>` : ''}
-                ${canDelete ? `<button class="btn btn-sm btn-outline" onclick="Jurnal.deleteGroup('${g.key}')" style="padding: 6px 12px; font-size: 11px; color: var(--red); border-color: var(--red);">O'chirish</button>` : ''}
-              </div>
+              <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+                <thead>
+                  <tr>
+                    <th style="padding: 6px 8px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">#</th>
+                    <th style="padding: 6px 8px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">Mahsulot</th>
+                    <th style="padding: 6px 8px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">Miqdor</th>
+                    <th style="padding: 6px 8px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">Narx</th>
+                    <th style="padding: 6px 8px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">Summa</th>
+                  </tr>
+                </thead>
+                <tbody>
+`;
+        g.items.forEach((item, index) => {
+          html += `<tr class="jurnal-detail" id="jrn-row-${item.id}" style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+            <td class="mono" style="padding: 8px; color: var(--text-muted); font-size: 12px;">${index + 1}</td>
+            <td style="padding: 8px; font-weight: 500; font-size: 13px;" class="edit-mahsulot">${item.mahsulot || '—'}</td>
+            <td class="mono edit-miqdor" style="padding: 8px; font-size: 13px;">${Utils.formatNumber(item.miqdor)}</td>
+            <td class="mono edit-narx" style="padding: 8px; font-size: 13px;">${item.narx ? Utils.formatSum(item.narx) : '—'}</td>
+            <td class="mono edit-summa" style="padding: 8px; font-size: 13px; color:${item.tur === 'Kirim' ? 'var(--green)' : 'var(--red)'}">${Utils.formatSum(item.summa)}</td>
+          </tr>`;
+        });
+        html += `
+                </tbody>
+              </table>
             </div>
           </td>
         </tr>`;
-        
-        g.items.forEach(item => {
-          const idx = jurnal.indexOf(item);
-          html += `<tr class="jurnal-detail" id="jrn-row-${item.id}">
-            <td class="mono" style="color:var(--text-muted)">${String(idx + 1).padStart(3, '0')}</td>
-            <td class="mono edit-sana" style="font-size:11px">${item.sana || '—'}</td>
-            <td></td><td></td>
-            <td style="font-weight:500;padding-left:20px" class="edit-mahsulot">${item.mahsulot || '—'}</td>
-            <td class="mono edit-miqdor">${Utils.formatNumber(item.miqdor)}</td>
-            <td class="mono edit-narx">${item.narx ? Utils.formatSum(item.narx) : '—'}</td>
-            <td class="mono edit-summa" style="color:${item.tur === 'Kirim' ? 'var(--green)' : 'var(--red)'}">${Utils.formatSum(item.summa)}</td>
-            <td></td>
-            <td></td>
-          </tr>`;
-        });
       }
     });
     document.getElementById('jurnal-rows').innerHTML = html;
@@ -111,8 +121,8 @@ const Jurnal = {
 
     tdSana.innerHTML = `<input type="text" class="f-input" id="edit-sana-${id}" value="${r.sana || ''}" style="margin:0; width:90px; font-size:11px; padding:4px;" placeholder="__/__/____">`;
     tdM.innerHTML = `<input type="text" class="f-input" id="edit-m-${id}" value="${r.mahsulot || ''}" list="products-list" style="margin:0; width:120px; font-size:12px; padding:4px;">`;
-    tdQ.innerHTML = `<input type="number" class="f-input" id="edit-q-${id}" value="${r.miqdor || 0}" style="margin:0; width:80px; font-size:12px; padding:4px;" oninput="Jurnal.calcSum('${id}')">`;
-    tdN.innerHTML = `<input type="number" class="f-input" id="edit-n-${id}" value="${r.narx || 0}" style="margin:0; width:100px; font-size:12px; padding:4px;" oninput="Jurnal.calcSum('${id}')">`;
+    tdQ.innerHTML = `<input type="text" inputmode="decimal" class="f-input" id="edit-q-${id}" value="${r.miqdor || 0}" style="margin:0; width:80px; font-size:12px; padding:4px;" oninput="Jurnal.onNumberInput(this); Jurnal.calcSum('${id}')">`;
+    tdN.innerHTML = `<input type="text" inputmode="decimal" class="f-input" id="edit-n-${id}" value="${r.narx || 0}" style="margin:0; width:100px; font-size:12px; padding:4px;" oninput="Jurnal.onNumberInput(this); Jurnal.calcSum('${id}')">`;
     tdS.innerHTML = `<input type="number" class="f-input" id="edit-s-${id}" value="${r.summa || 0}" style="margin:0; width:100px; font-size:12px; padding:4px;">`;
 
     tdA.innerHTML = `
@@ -127,6 +137,17 @@ const Jurnal = {
     if (q && n) {
       document.getElementById('edit-s-' + id).value = q * n;
     }
+  },
+
+  onNumberInput(input) {
+    let value = input.value;
+    value = value.replace(/,/g, '.');
+    value = value.replace(/[^0-9.]/g, '');
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    input.value = value;
   },
 
   async saveEdit(id) {
@@ -272,11 +293,11 @@ const Jurnal = {
                   </div>
                   <div>
                     <label style="font-size:10px;color:var(--text-muted);">Miqdor</label>
-                    <input type="number" class="edit-product-miqdor" value="${item.miqdor || 0}" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
+                    <input type="text" inputmode="decimal" class="edit-product-miqdor" value="${item.miqdor || 0}" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;" oninput="Jurnal.onNumberInput(this)">
                   </div>
                   <div>
                     <label style="font-size:10px;color:var(--text-muted);">Narx</label>
-                    <input type="number" class="edit-product-narx" value="${item.narx || 0}" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
+                    <input type="text" inputmode="decimal" class="edit-product-narx" value="${item.narx || 0}" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;" oninput="Jurnal.onNumberInput(this)">
                   </div>
                   <div style="display:flex;align-items:flex-end;">
                     <button onclick="this.closest('div').parentElement.remove()" style="padding:8px;background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:6px;cursor:pointer;font-size:12px;">🗑️</button>
@@ -314,11 +335,11 @@ const Jurnal = {
         </div>
         <div>
           <label style="font-size:10px;color:var(--text-muted);">Miqdor</label>
-          <input type="number" class="edit-product-miqdor" value="0" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
+          <input type="text" inputmode="decimal" class="edit-product-miqdor" value="0" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;" oninput="Jurnal.onNumberInput(this)">
         </div>
         <div>
           <label style="font-size:10px;color:var(--text-muted);">Narx</label>
-          <input type="number" class="edit-product-narx" value="0" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
+          <input type="text" inputmode="decimal" class="edit-product-narx" value="0" style="width:100%;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;" oninput="Jurnal.onNumberInput(this)">
         </div>
         <div style="display:flex;align-items:flex-end;">
           <button onclick="this.closest('div').parentElement.remove()" style="padding:8px;background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:6px;cursor:pointer;font-size:12px;">🗑️</button>

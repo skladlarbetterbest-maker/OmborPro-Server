@@ -36,6 +36,11 @@ const MinQoldiq = {
     })).filter(i => i.qoldiq >= 0);
 
     if (search) items = items.filter(i => i.nom.toLowerCase().includes(search));
+    
+    const onlyRed = document.getElementById('minq-only-red')?.checked;
+    if (onlyRed) {
+      items = items.filter(i => i.qoldiq <= i.limit);
+    }
 
     // Sort
     items.sort((a, b) => {

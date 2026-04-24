@@ -32,64 +32,6 @@ async function query(text, params) {
 }
 
 async function initTables() {
-  await query(`CREATE TABLE IF NOT EXISTS users (
-    login VARCHAR(100) PRIMARY KEY, pass VARCHAR(255), telegram_id VARCHAR(50),
-    block VARCHAR(1) DEFAULT 'E', active BOOLEAN DEFAULT true, role VARCHAR(20) DEFAULT 'free',
-    obyekt JSONB DEFAULT '["Barchasi"]'::jsonb, ombor VARCHAR(100) DEFAULT 'Barchasi',
-    can_edit_jurnal BOOLEAN DEFAULT true, can_delete_jurnal BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS jurnal (
-    id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), tur VARCHAR(10), mahsulot VARCHAR(255),
-    miqdor DECIMAL(15,2), narx DECIMAL(15,2), summa DECIMAL(15,2), tomon VARCHAR(255),
-    obyekt VARCHAR(100), izoh TEXT, operator VARCHAR(100),
-    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS history (
-    id VARCHAR(50) PRIMARY KEY, action VARCHAR(20), source_id VARCHAR(50), sana VARCHAR(20),
-    tur VARCHAR(10), mahsulot VARCHAR(255), miqdor DECIMAL(15,2), narx DECIMAL(15,2),
-    summa DECIMAL(15,2), tomon VARCHAR(255), obyekt VARCHAR(100), izoh TEXT,
-    operator VARCHAR(100), changed_by VARCHAR(100), timestamp TIMESTAMP DEFAULT NOW(), changed_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS katalog (
-    id VARCHAR(50) PRIMARY KEY, nom VARCHAR(255) UNIQUE, olv VARCHAR(50),
-    active BOOLEAN DEFAULT true, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS obyektlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
-  await query(`CREATE TABLE IF NOT EXISTS omborlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
-  await query(`CREATE TABLE IF NOT EXISTS firms (
-    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255) UNIQUE, inn VARCHAR(50),
-    telegram VARCHAR(100), phone VARCHAR(50), address TEXT, note TEXT,
-    active BOOLEAN DEFAULT true, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS settings (key VARCHAR(100) PRIMARY KEY, value TEXT)`);
-  await query(`CREATE TABLE IF NOT EXISTS inv_links (
-    id VARCHAR(50) PRIMARY KEY, token VARCHAR(100) UNIQUE, obyekt VARCHAR(100),
-    operator VARCHAR(100), status VARCHAR(20) DEFAULT 'jarayonda', sana VARCHAR(20),
-    vaqt VARCHAR(20), diffs JSONB, yakunlangan_vaqt VARCHAR(20), created_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS transfers (
-    id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), kimdan VARCHAR(100), kimga VARCHAR(100),
-    mahsulot VARCHAR(255), miqdor DECIMAL(15,2), operator VARCHAR(100), created_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS inventarizatsiya (
-    id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), obyekt VARCHAR(100),
-    operator VARCHAR(100), data JSONB, created_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS min_stock (
-    product_name VARCHAR(255) PRIMARY KEY, min_qty DECIMAL(15,2), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS debtors (
-    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255), phone VARCHAR(50),
-    address TEXT, summa DECIMAL(15,2), izoh TEXT,
-    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  await query(`CREATE TABLE IF NOT EXISTS creditors (
-    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255), phone VARCHAR(50),
-    address TEXT, summa DECIMAL(15,2), izoh TEXT,
-    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
-  )`);
-  async function initTables() {
   // Users
   await query(`CREATE TABLE IF NOT EXISTS users (
     login VARCHAR(100) PRIMARY KEY, pass VARCHAR(255), telegram_id VARCHAR(50),
@@ -101,16 +43,18 @@ async function initTables() {
   // Jurnal
   await query(`CREATE TABLE IF NOT EXISTS jurnal (
     id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), tur VARCHAR(10), mahsulot VARCHAR(255),
-    miqdor DECIMAL(15,2), narx DECIMAL(15,2), summa DECIMAL(15,2), tomon VARCHAR(255),
+    miqdor NUMERIC(15,4), narx NUMERIC(15,2), summa NUMERIC(15,2), tomon VARCHAR(255),
     obyekt VARCHAR(100), izoh TEXT, operator VARCHAR(100),
+    editedby VARCHAR(100), editedat TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
-  // History
+  // History (setup.sql sxemasiga mos)
   await query(`CREATE TABLE IF NOT EXISTS history (
-    id VARCHAR(50) PRIMARY KEY, action VARCHAR(20), source_id VARCHAR(50), sana VARCHAR(20),
-    tur VARCHAR(10), mahsulot VARCHAR(255), miqdor DECIMAL(15,2), narx DECIMAL(15,2),
-    summa DECIMAL(15,2), tomon VARCHAR(255), obyekt VARCHAR(100), izoh TEXT,
-    operator VARCHAR(100), changed_by VARCHAR(100), timestamp TIMESTAMP DEFAULT NOW(), changed_at TIMESTAMP DEFAULT NOW()
+    id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), tur VARCHAR(10), mahsulot VARCHAR(255),
+    miqdor NUMERIC(15,4), narx NUMERIC(15,2), summa NUMERIC(15,2), tomon VARCHAR(255),
+    obyekt VARCHAR(100), izoh TEXT, operator VARCHAR(100),
+    action VARCHAR(20), editedby VARCHAR(100), deletedby VARCHAR(100),
+    newvalues JSONB, timestamp TIMESTAMP DEFAULT NOW()
   )`);
   // Katalog
   await query(`CREATE TABLE IF NOT EXISTS katalog (
@@ -138,7 +82,7 @@ async function initTables() {
   // Transfers
   await query(`CREATE TABLE IF NOT EXISTS transfers (
     id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), kimdan VARCHAR(100), kimga VARCHAR(100),
-    mahsulot VARCHAR(255), miqdor DECIMAL(15,2), operator VARCHAR(100), created_at TIMESTAMP DEFAULT NOW()
+    mahsulot VARCHAR(255), miqdor NUMERIC(15,4), operator VARCHAR(100), created_at TIMESTAMP DEFAULT NOW()
   )`);
   // Inventarizatsiya
   await query(`CREATE TABLE IF NOT EXISTS inventarizatsiya (
@@ -147,35 +91,41 @@ async function initTables() {
   )`);
   // Min_stock
   await query(`CREATE TABLE IF NOT EXISTS min_stock (
-    product_name VARCHAR(255) PRIMARY KEY, min_qty DECIMAL(15,2), updated_at TIMESTAMP DEFAULT NOW()
+    product_name VARCHAR(255) PRIMARY KEY, min_qty NUMERIC(15,4), updated_at TIMESTAMP DEFAULT NOW()
   )`);
   // Debtors
   await query(`CREATE TABLE IF NOT EXISTS debtors (
     id VARCHAR(50) PRIMARY KEY, name VARCHAR(255), phone VARCHAR(50),
-    address TEXT, summa DECIMAL(15,2), izoh TEXT,
+    address TEXT, summa NUMERIC(15,2), izoh TEXT,
     created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
   // Creditors
   await query(`CREATE TABLE IF NOT EXISTS creditors (
     id VARCHAR(50) PRIMARY KEY, name VARCHAR(255), phone VARCHAR(50),
-    address TEXT, summa DECIMAL(15,2), izoh TEXT,
+    address TEXT, summa NUMERIC(15,2), izoh TEXT,
     created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
   // Payments
   await query(`CREATE TABLE IF NOT EXISTS payments (
-    id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), tur VARCHAR(20), name VARCHAR(255),
-    summa DECIMAL(15,2), izoh TEXT, operator VARCHAR(100), created_at TIMESTAMP DEFAULT NOW()
+    id VARCHAR(50) PRIMARY KEY, sana VARCHAR(20), tur VARCHAR(50), name VARCHAR(255),
+    summa NUMERIC(15,2), izoh TEXT, operator VARCHAR(100), created_at TIMESTAMP DEFAULT NOW()
   )`);
 
-  // Migrate existing tables
+  // Migrate existing tables (eski bazalar uchun)
+  try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS editedby VARCHAR(100)`); } catch(e) {}
+  try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS deletedby VARCHAR(100)`); } catch(e) {}
+  try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS newvalues JSONB`); } catch(e) {}
   try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT NOW()`); } catch(e) {}
   try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS tomon VARCHAR(255)`); } catch(e) {}
   try { await query(`ALTER TABLE jurnal ADD COLUMN IF NOT EXISTS tomon VARCHAR(255)`); } catch(e) {}
+  try { await query(`ALTER TABLE jurnal ADD COLUMN IF NOT EXISTS editedby VARCHAR(100)`); } catch(e) {}
+  try { await query(`ALTER TABLE jurnal ADD COLUMN IF NOT EXISTS editedat TIMESTAMP`); } catch(e) {}
 
   // Seed defaults
   const users = await query('SELECT * FROM users WHERE login = $1', ['jamoliddin']);
   if (users.rows.length === 0) {
-    await query(`INSERT INTO users (login, pass, block, active, role, obyekt, ombor, can_edit_jurnal, can_delete_jurnal) VALUES ('jamoliddin', '122', 'E', true, 'admin', 'Barchasi', 'Barchasi', true, true)`);
+    await query(`INSERT INTO users (login, pass, block, active, role, obyekt, ombor, can_edit_jurnal, can_delete_jurnal)
+      VALUES ('jamoliddin', '122', 'E', true, 'admin', '["Barchasi"]'::jsonb, 'Barchasi', true, true)`);
   }
 
   try {
@@ -187,27 +137,8 @@ async function initTables() {
     const omborlar = await query("SELECT * FROM omborlar WHERE name = 'Barchasi'");
     if (omborlar.rows.length === 0) await query("INSERT INTO omborlar (name) VALUES ('Barchasi')");
   } catch(e) {}
-}
 
-initTables().catch(console.error);
-
-  const users = await query('SELECT * FROM users WHERE login = $1', ['jamoliddin']);
-  if (users.rows.length === 0) {
-    await query(`
-      INSERT INTO users (login, pass, block, active, role, obyekt, ombor, can_edit_jurnal, can_delete_jurnal)
-      VALUES ('jamoliddin', '122', 'E', true, 'admin', 'Barchasi', 'Barchasi', true, true)
-    `);
-  }
-
-  const obyektlar = await query("SELECT * FROM obyektlar WHERE name = 'Barchasi'");
-  if (obyektlar.rows.length === 0) {
-    await query("INSERT INTO obyektlar (name) VALUES ('Barchasi')");
-  }
-
-  const omborlar = await query("SELECT * FROM omborlar WHERE name = 'Barchasi'");
-  if (omborlar.rows.length === 0) {
-    await query("INSERT INTO omborlar (name) VALUES ('Barchasi')");
-  }
+  console.log('✅ Barcha jadvallar tayyor');
 }
 
 initTables().catch(console.error);
@@ -459,7 +390,10 @@ async function getTransfers() {
 
 async function addTransfer(transfer) {
   const id = uid('TRF');
-  const { sana, kimdan, kimga, mahsulot, miqdor, operator } = transfer;
+  const { sana, mahsulot, miqdor, operator } = transfer;
+  // Route fromObyekt/toObyekt yoki kimdan/kimga yuborishi mumkin
+  const kimdan = transfer.kimdan || transfer.fromObyekt || '';
+  const kimga = transfer.kimga || transfer.toObyekt || '';
   const res = await query(`
     INSERT INTO transfers (id, sana, kimdan, kimga, mahsulot, miqdor, operator, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
@@ -515,12 +449,14 @@ async function getDebtors() {
 
 async function addDebtor(entry) {
   const id = uid('DBT');
-  const { name, phone, address, summa, izoh } = entry;
+  // Route firma yoki name yuborishi mumkin
+  const name = entry.name || entry.firma || '';
+  const { phone, address, summa, izoh } = entry;
   const res = await query(`
     INSERT INTO debtors (id, name, phone, address, summa, izoh, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, NOW())
     RETURNING *
-  `, [id, name, phone, address, summa, izoh]);
+  `, [id, name, phone || '', address || '', summa, izoh || '']);
   return res.rows[0];
 }
 
@@ -547,12 +483,14 @@ async function getCreditors() {
 
 async function addCreditor(entry) {
   const id = uid('CRD');
-  const { name, phone, address, summa, izoh } = entry;
+  // Route firma yoki name yuborishi mumkin
+  const name = entry.name || entry.firma || '';
+  const { phone, address, summa, izoh } = entry;
   const res = await query(`
     INSERT INTO creditors (id, name, phone, address, summa, izoh, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, NOW())
     RETURNING *
-  `, [id, name, phone, address, summa, izoh]);
+  `, [id, name, phone || '', address || '', summa, izoh || '']);
   return res.rows[0];
 }
 
@@ -579,12 +517,15 @@ async function getPayments() {
 
 async function addPayment(entry) {
   const id = uid('PAY');
-  const { sana, tur, name, summa, izoh, operator } = entry;
+  // Route type/firma yoki tur/name yuborishi mumkin
+  const tur = entry.tur || entry.type || '';
+  const name = entry.name || entry.firma || '';
+  const { sana, summa, izoh, operator } = entry;
   const res = await query(`
     INSERT INTO payments (id, sana, tur, name, summa, izoh, operator, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
     RETURNING *
-  `, [id, sana || dateUz(), tur, name, summa, izoh, operator]);
+  `, [id, sana || dateUz(), tur, name, summa, izoh || '', operator]);
   return res.rows[0];
 }
 
