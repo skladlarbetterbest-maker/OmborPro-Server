@@ -1,12 +1,11 @@
 /**
  * Admin — Foydalanuvchilarni boshqarish
  */
-console.log('Admin.js loaded v2026-04-21-3');
+console.log('Admin.js loaded v2026-04-24');
 
 const Admin = {
   render() {
     const users = App.data.users || {};
-    // "O'chirish" backendda active=false (soft delete). UIda bunday userlarni yashiramiz.
     const usersArr = Object.entries(users);
     const grid = document.getElementById('admin-users-grid');
     const roleColors = { admin:'var(--accent-gradient)', 'pro+':'linear-gradient(135deg,#ec4899,#f472b6)', pro:'linear-gradient(135deg,#f59e0b,#fbbf24)', free:'linear-gradient(135deg,#475569,#64748b)' };
@@ -113,20 +112,16 @@ const Admin = {
     } catch (e) {
       console.error('Admin.addUser xato:', e);
       Utils.showMsg('add-user-msg', 'Server bilan ulanishda xato!', 'err');
-alert('Server bilan ulanishda xato!');
     }
   },
-  async changePass(login) {
-    const newPass = prompt('Yangi parol kiriting:');
-    if (!newPass || newPass.length < 3) { alert('Parol kamida 3 belgidan iborat bo\'lishi kerak!'); return; }
+
+  async changeRole(login, role) {
     try {
-      const res = await API.updateUser(login, { password: newPass });
-      if (!res.ok) { alert(res.error || 'Parol o\'zgartirishda xato!'); return; }
-      alert('Parol muvaffaqiyatli o\'zgartirildi!');
-    } catch (e) {
-      alert('Server bilan ulanishda xato!');
-    }
-  }
+      const res = await API.updateUser(login, { role });
+      if (!res.ok) {
+        alert(res.error || 'Role o\'zgartirishda xato!');
+        return;
+      }
       await App.loadData();
       this.render();
     } catch (e) {
@@ -134,6 +129,7 @@ alert('Server bilan ulanishda xato!');
       alert('Server bilan ulanishda xato!');
     }
   },
+
   async changeObyekt(login, obyekt) {
     try {
       const res = await API.updateUser(login, { obyekt });
@@ -148,8 +144,8 @@ alert('Server bilan ulanishda xato!');
       alert('Server bilan ulanishda xato!');
     }
   },
+
   async changePerm(login, field, value) {
-    // Backend snake_case field nomlarini kutadi
     const keyMap = {
       canEditJurnal: 'can_edit_jurnal',
       canDeleteJurnal: 'can_delete_jurnal'
@@ -168,6 +164,7 @@ alert('Server bilan ulanishda xato!');
       alert('Server bilan ulanishda xato!');
     }
   },
+
   async toggleBlock(login) {
     if (login === App.currentUser?.login) { alert('O\'zingizni bloklash mumkin emas!'); return; }
     const user = App.data.users[login];
@@ -184,6 +181,7 @@ alert('Server bilan ulanishda xato!');
       alert('Server bilan ulanishda xato!');
     }
   },
+
   async deleteUser(login) {
     if (login === App.currentUser?.login) { alert('O\'zingizni o\'chirish mumkin emas!'); return; }
     if (!confirm('O\'chirishni tasdiqlaysizmi?')) return;
@@ -197,6 +195,18 @@ alert('Server bilan ulanishda xato!');
       this.render();
     } catch (e) {
       console.error('Admin.deleteUser xato:', e);
+      alert('Server bilan ulanishda xato!');
+    }
+  },
+
+  async changePass(login) {
+    const newPass = prompt('Yangi parol kiriting:');
+    if (!newPass || newPass.length < 3) { alert('Parol kamida 3 belgidan iborat bo\'lishi kerak!'); return; }
+    try {
+      const res = await API.updateUser(login, { password: newPass });
+      if (!res.ok) { alert(res.error || 'Parol o\'zgartirishda xato!'); return; }
+      alert('Parol muvaffaqiyatli o\'zgartirildi!');
+    } catch (e) {
       alert('Server bilan ulanishda xato!');
     }
   }
