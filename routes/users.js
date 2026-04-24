@@ -10,12 +10,17 @@ router.get('/', authMiddleware, adminOnly, async (req, res) => {
   const users = await store.getUsers();
   const safe = {};
   Object.entries(users).forEach(([login, data]) => {
-    // Obyektni array sifatida qaytarish (agar string bo'lsa arrayga aylantirish)
+    // Obyektni to'g'ri formatda qaytarish
     let obyektData = data.obyekt || 'Barchasi';
     if (typeof obyektData === 'string') {
+      try {
+        obyektData = JSON.parse(obyektData);
+      } catch (e) {
+        obyektData = [obyektData];
+      }
+    }
+    if (!Array.isArray(obyektData)) {
       obyektData = [obyektData];
-    } else if (!Array.isArray(obyektData)) {
-      obyektData = ['Barchasi'];
     }
 
     safe[login] = {

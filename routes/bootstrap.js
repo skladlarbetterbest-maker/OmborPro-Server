@@ -11,7 +11,19 @@ router.get('/', authMiddleware, async (req, res) => {
     const userRole = req.user.role;
     const user = await store.getUser(req.user.login) || {};
     const isAdmin = userRole === 'admin' || userRole === 'owner';
-    const allowedObyekt = user.obyekt || 'Barchasi';
+
+    // Allowed obyektni to'g'ri formatda olish
+    let allowedObyekt = user.obyekt || 'Barchasi';
+    if (typeof allowedObyekt === 'string') {
+      try {
+        allowedObyekt = JSON.parse(allowedObyekt);
+      } catch (e) {
+        allowedObyekt = [allowedObyekt];
+      }
+    }
+    if (!Array.isArray(allowedObyekt)) {
+      allowedObyekt = [allowedObyekt];
+    }
 
     const users = await store.getUsers();
     let jurnal = await store.getJurnal();
@@ -28,21 +40,34 @@ router.get('/', authMiddleware, async (req, res) => {
     const creditors = await store.getCreditors();
     const payments = await store.getPayments();
 
-    if (!isAdmin && allowedObyekt !== 'Barchasi') {
-      jurnal = jurnal.filter(r => r.obyekt === allowedObyekt);
-      history = history.filter(r => r.obyekt === allowedObyekt);
-      transfers = transfers.filter(r => r.from === allowedObyekt || r.to === allowedObyekt);
-      inventarizatsiya = inventarizatsiya.filter(r => r.obyekt === allowedObyekt);
-      obyektlar = obyektlar.filter(o => o === allowedObyekt || o === 'Barchasi');
+    if (!isAdmin && !allowedObyekt.includes('Barchasi')) {
+      jurnal = jurnal.filter(r => allowedObyekt.includes(r.obyekt));
+      history = history.filter(r => allowedObyekt.includes(r.obyekt));
+      transfers = transfers.filter(r => allowedObyekt.includes(r.from) || allowedObyekt.includes(r.to));
+      inventarizatsiya = inventarizatsiya.filter(r => allowedObyekt.includes(r.obyekt));
+      obyektlar = obyektlar.filter(o => allowedObyekt.includes(o) || o === 'Barchasi');
     }
 
     const safeUsers = {};
     Object.entries(users).forEach(([login, data]) => {
+      // Obyektni to'g'ri formatda qaytarish
+      let obyektValue = data.obyekt || 'Barchasi';
+      if (typeof obyektValue === 'string') {
+        try {
+          obyektValue = JSON.parse(obyektValue);
+        } catch (e) {
+          obyektValue = [obyektValue];
+        }
+      }
+      if (!Array.isArray(obyektValue)) {
+        obyektValue = [obyektValue];
+      }
+
       safeUsers[login] = {
         login,
         role: data.role || 'free',
         active: data.active !== false,
-        obyekt: data.obyekt || 'Barchasi',
+        obyekt: obyektValue,
         ombor: data.ombor || 'Barchasi',
         telegramId: data.telegram_id || '',
         canEditJurnal: !!data.can_edit_jurnal,

@@ -28,13 +28,26 @@ router.post('/login', async (req, res) => {
     { expiresIn: config.JWT_EXPIRES }
   );
 
+  // Obyektni to'g'ri formatda qaytarish
+  let obyektValue = user.obyekt || 'Barchasi';
+  if (typeof obyektValue === 'string') {
+    try {
+      obyektValue = JSON.parse(obyektValue);
+    } catch (e) {
+      obyektValue = [obyektValue];
+    }
+  }
+  if (!Array.isArray(obyektValue)) {
+    obyektValue = [obyektValue];
+  }
+
   res.json({
     ok: true,
     token,
     user: {
       login: username,
       role: user.role || 'free',
-      obyekt: user.obyekt || 'Barchasi',
+      obyekt: obyektValue,
       ombor: user.ombor || 'Barchasi',
       canEditJurnal: !!user.can_edit_jurnal,
       canDeleteJurnal: !!user.can_delete_jurnal,
@@ -47,12 +60,25 @@ router.post('/login', async (req, res) => {
 router.get('/me', require('../middleware/auth').authMiddleware, async (req, res) => {
   const user = await store.getUser(req.user.login);
   if (!user) return res.status(404).json({ ok: false, error: 'User topilmadi' });
+  // Obyektni to'g'ri formatda qaytarish
+  let obyektValue = user.obyekt || 'Barchasi';
+  if (typeof obyektValue === 'string') {
+    try {
+      obyektValue = JSON.parse(obyektValue);
+    } catch (e) {
+      obyektValue = [obyektValue];
+    }
+  }
+  if (!Array.isArray(obyektValue)) {
+    obyektValue = [obyektValue];
+  }
+
   res.json({
     ok: true,
     user: {
       login: req.user.login,
       role: user.role || 'free',
-      obyekt: user.obyekt || 'Barchasi',
+      obyekt: obyektValue,
       ombor: user.ombor || 'Barchasi',
       canEditJurnal: !!user.can_edit_jurnal,
       canDeleteJurnal: !!user.can_delete_jurnal
