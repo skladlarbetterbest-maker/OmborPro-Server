@@ -40,6 +40,7 @@ const Admin = {
           </label>
           <button class="btn btn-sm ${data.active?'btn-red':'btn-green'}" data-action="toggleBlock" data-login="${name}" style="padding:8px;font-size:10px">${data.active?'BLOK':'AKTIV'}</button>
           <button class="btn btn-sm btn-outline" data-action="deleteUser" data-login="${name}" style="padding:8px;font-size:10px;color:var(--red);border-color:var(--red)">O'CHIRISH</button>
+          <button class="btn btn-sm btn-outline" data-action="changePass" data-login="${name}" style="padding:8px;font-size:10px">PAROL</button>
         </div>
       </div>
     `).join('') : '<div class="empty-state">Foydalanuvchilar yo\'q</div>';
@@ -83,6 +84,7 @@ const Admin = {
 
       if (action === 'toggleBlock') this.toggleBlock(login);
       if (action === 'deleteUser') this.deleteUser(login);
+      if (action === 'changePass') this.changePass(login);
     });
   },
 
@@ -111,17 +113,20 @@ const Admin = {
     } catch (e) {
       console.error('Admin.addUser xato:', e);
       Utils.showMsg('add-user-msg', 'Server bilan ulanishda xato!', 'err');
-      alert('Server bilan ulanishda xato!');
+alert('Server bilan ulanishda xato!');
     }
   },
-
-  async changeRole(login, role) {
+  async changePass(login) {
+    const newPass = prompt('Yangi parol kiriting:');
+    if (!newPass || newPass.length < 3) { alert('Parol kamida 3 belgidan iborat bo\'lishi kerak!'); return; }
     try {
-      const res = await API.updateUser(login, { role });
-      if (!res.ok) {
-        alert(res.error || 'Role o\'zgartirishda xato!');
-        return;
-      }
+      const res = await API.updateUser(login, { password: newPass });
+      if (!res.ok) { alert(res.error || 'Parol o\'zgartirishda xato!'); return; }
+      alert('Parol muvaffaqiyatli o\'zgartirildi!');
+    } catch (e) {
+      alert('Server bilan ulanishda xato!');
+    }
+  }
       await App.loadData();
       this.render();
     } catch (e) {
