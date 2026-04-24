@@ -86,8 +86,8 @@ router.put('/:login', authMiddleware, adminOnly, async (req, res) => {
     updates.role = req.body.role;
   }
 
-  // Admin yoki owner userni o'zgartirish faqat owner uchun
-  if ((targetUser.role === 'admin' || targetUser.role === 'owner') && req.user.role !== 'owner') {
+  // Admin yoki owner userni o'zgartirish faqat owner uchun (lekin o'zini o'zi o'zgartirishi mumkin)
+  if ((targetUser.role === 'admin' || targetUser.role === 'owner') && req.user.role !== 'owner' && req.user.login !== username) {
     return res.status(403).json({ ok: false, error: 'Admin/Owner userni o\'zgartirish faqat owner uchun!' });
   }
 
