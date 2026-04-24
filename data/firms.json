@@ -1,0 +1,48 @@
+[
+  {
+    "id": "FRM_4E030375",
+    "name": "Abyekt 1",
+    "phone": "",
+    "note": "",
+    "active": true,
+    "createdAt": "2026-04-16T10:53:41.094Z",
+    "updatedAt": "2026-04-17T11:46:48.551Z"
+  },
+  {
+    "id": "FRM_23C3DE38",
+    "name": "star fix",
+    "phone": "",
+    "note": "",
+    "active": true,
+    "createdAt": "2026-04-16T10:57:04.534Z",
+    "updatedAt": "2026-04-16T11:21:40.015Z"
+  },
+  {
+    "id": "FRM_61E58382",
+    "name": "gumbaz bozor",
+    "phone": "[object Object]",
+    "note": "",
+    "active": true,
+    "createdAt": "2026-04-16T11:55:22.538Z"
+  },
+  {
+    "id": "FRM_9FA2D842",
+    "name": "dumbirobot",
+    "phone": "",
+    "note": "",
+    "active": true,
+    "createdAt": "2026-04-17T04:46:39.390Z",
+    "updatedAt": "2026-04-17T04:46:39.396Z"
+  },
+  {
+    "id": "FRM_A7D780AB",
+    "name": "Barchasi",
+    "phone": "",
+    "address": "",
+    "inn": "",
+    "note": "",
+    "active": true,
+    "createdAt": "2026-04-17T12:02:58.770Z",
+    "updatedAt": "2026-04-17T12:03:13.503Z"
+  }
+]

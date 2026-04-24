@@ -1,0 +1,28 @@
+{
+  "jamoliddin": {
+    "pass": "122",
+    "telegramId": "",
+    "block": "E",
+    "active": true,
+    "role": "admin",
+    "obyekt": "Barchasi",
+    "ombor": "Barchasi",
+    "canEditJurnal": true,
+    "canDeleteJurnal": true,
+    "createdAt": "2026-04-16T10:23:16.934Z",
+    "updatedAt": "2026-04-17T05:14:30.114Z"
+  },
+  "test1": {
+    "pass": "000",
+    "telegramId": "",
+    "block": "F",
+    "active": true,
+    "role": "pro",
+    "obyekt": "Abyekt 1",
+    "ombor": "Barchasi",
+    "canEditJurnal": true,
+    "canDeleteJurnal": false,
+    "createdAt": "2026-04-16T11:00:31.182Z",
+    "updatedAt": "2026-04-16T12:21:27.517Z"
+  }
+}

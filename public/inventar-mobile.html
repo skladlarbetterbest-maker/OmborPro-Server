@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Inventarizatsiya — OmborPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: #1e293b;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-bar-left h2 { font-size: 15px; font-weight: 700; color: #38bdf8; }
+    .top-bar-left .sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .progress-pill {
+      background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 12px; font-weight: 600; color: #38bdf8;
+    }
+
+    /* ── SEARCH ── */
+    .search-wrap { padding: 12px 16px; background: #1e293b; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .search-input {
+      width: 100%; background: #0f172a;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 11px 14px;
+      color: #e2e8f0; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: #38bdf8; }
+
+    /* ── PROGRESS BAR ── */
+    .prog-bar-wrap { padding: 8px 16px; background: #0f172a; }
+    .prog-bar { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #34d399); transition: width 0.4s; border-radius: 2px; }
+
+    /* ── ITEM CARDS ── */
+    .list-wrap { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; padding-bottom: 120px; }
+
+    .item-card {
+      background: #1e293b;
+      border: 1.5px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 13px 14px;
+      transition: border-color 0.2s;
+    }
+    .item-card.changed-pos { border-color: rgba(52,211,153,0.4); }
+    .item-card.changed-neg { border-color: rgba(248,113,113,0.4); }
+
+    .item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .item-name { font-size: 14px; font-weight: 600; line-height: 1.3; flex: 1; padding-right: 8px; }
+    .item-sys { font-size: 11px; color: #64748b; text-align: right; }
+    .item-sys b { color: #38bdf8; font-size: 13px; }
+
+    .item-bottom { display: flex; align-items: center; gap: 10px; }
+    .item-input {
+      flex: 1; background: #0f172a;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 10px 12px;
+      color: #fff; font-size: 18px; font-weight: 600;
+      text-align: center; font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .item-input:focus { border-color: #38bdf8; }
+    .item-diff {
+      min-width: 52px; text-align: center;
+      font-size: 18px; font-weight: 700; color: #475569;
+    }
+    .item-diff.pos { color: #34d399; }
+    .item-diff.neg { color: #f87171; }
+
+    /* ── FOOTER ACTIONS ── */
+    .footer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(0deg, #0f172a 80%, transparent);
+      padding: 16px 16px 20px;
+    }
+    .btn-submit {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      border: none; border-radius: 12px;
+      color: #fff; font-size: 16px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 20px rgba(14,165,233,0.3);
+    }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── RESULT ── */
+    .result-section { padding: 16px; display: none; }
+    .result-card { background: #1e293b; border-radius: 14px; padding: 20px; }
+    .result-title { font-size: 16px; font-weight: 700; color: #38bdf8; margin-bottom: 16px; }
+    .result-item { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+    .result-item:last-child { border: none; }
+    .result-farq { font-weight: 700; }
+    .result-farq.pos { color: #34d399; }
+    .result-farq.neg { color: #f87171; }
+    .result-total { display: flex; justify-content: space-between; padding: 12px; margin-top: 12px; background: rgba(56,189,248,0.08); border-radius: 8px; font-weight: 700; }
+    .result-total span:last-child { color: #38bdf8; }
+
+    .no-diffs { text-align: center; padding: 24px; color: #34d399; font-weight: 600; }
+
+    .btn-dl { width: 100%; padding: 14px; margin-top: 10px; background: #34d399; color: #000; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .btn-close { width: 100%; padding: 12px; margin-top: 8px; background: transparent; border: 1.5px solid rgba(255,255,255,0.1); color: #64748b; border-radius: 10px; font-size: 14px; cursor: pointer; font-family: inherit; }
+
+    /* ── LOADING ── */
+    .loading { text-align: center; padding: 60px 20px; color: #475569; }
+    .loading-dot { width: 8px; height: 8px; background: #38bdf8; border-radius: 50%; display: inline-block; margin: 0 3px; animation: blink 1.2s infinite both; }
+    .loading-dot:nth-child(2) { animation-delay: .2s; }
+    .loading-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <h2>📦 Inventarizatsiya</h2>
+      <div class="sub" id="obyektName">Yuklanmoqda...</div>
+    </div>
+    <div class="progress-pill" id="progressPill">0 / 0</div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Mahsulot qidirish..." oninput="filterItems()">
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="prog-bar-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- ITEMS LIST -->
+  <div class="list-wrap" id="itemList">
+    <div class="loading">
+      <div style="margin-bottom:12px">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+      <div style="font-size:13px">Mahsulotlar yuklanmoqda...</div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-section" id="resultSection">
+    <div class="result-card">
+      <div class="result-title">📋 Inventarizatsiya natijalari</div>
+      <div id="resultList"></div>
+    </div>
+    <button class="btn-dl" id="btnDownload" style="display:none" onclick="downloadExcel()">📥 Excel yuklab olish</button>
+    <button class="btn-close" onclick="closePage()">✕ Sahifani yopish</button>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" id="footerBar">
+    <button class="btn-submit" id="btnSubmit" onclick="submitInventar()">✅ INVENTARIZATSIYANI TUGATISH</button>
+  </div>
+
+  <script>
+    const baseUrl = window.location.origin;
+    const token   = window.location.pathname.split('/').pop();
+    let allItems  = [];   // original sorted array (mahsulot, tizimda)
+    let lastResult = null;
+
+    // ── LOAD DATA ──────────────────────────────────────────────────────────
+    async function loadData() {
+      try {
+        const res  = await fetch(`${baseUrl}/api/warehouse/mobile/data/${token}`);
+        const data = await res.json();
+        if (!data.ok) {
+          document.getElementById('itemList').innerHTML = `<div class="loading">Xato: ${data.error}</div>`;
+          return;
+        }
+        document.getElementById('obyektName').textContent = '📍 ' + data.obyekt;
+        allItems = data.products.sort((a, b) => b.tizimda - a.tizimda);
+        renderItems(allItems);
+      } catch (e) {
+        document.getElementById('itemList').innerHTML = '<div class="loading">Serverga ulanib bo\'lmadi</div>';
+      }
+    }
+
+    // ── RENDER ─────────────────────────────────────────────────────────────
+    function renderItems(items) {
+      if (!items.length) {
+        document.getElementById('itemList').innerHTML = '<div class="loading">Mahsulotlar yo\'q</div>';
+        return;
+      }
+      document.getElementById('itemList').innerHTML = items.map((item, i) => `
+        <div class="item-card" id="card-${item.mahsulot.replace(/\W/g,'_')}">
+          <div class="item-top">
+            <div class="item-name">${item.mahsulot}</div>
+            <div class="item-sys">Tizimda<br><b>${item.tizimda}</b></div>
+          </div>
+          <div class="item-bottom">
+            <input type="number" class="item-input"
+              id="inp-${item.mahsulot.replace(/\W/g,'_')}"
+              data-nom="${item.mahsulot}" data-tizimda="${item.tizimda}"
+              value="${item.tizimda}" min="0" inputmode="numeric"
+              oninput="onInput(this)">
+            <div class="item-diff" id="diff-${item.mahsulot.replace(/\W/g,'_')}">±0</div>
+          </div>
+        </div>
+      `).join('');
+      updateProgress();
+    }
+
+    function filterItems() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = q ? allItems.filter(i => i.mahsulot.toLowerCase().includes(q)) : allItems;
+      renderItems(filtered);
+    }
+
+    function onInput(inp) {
+      const tizimda = Number(inp.dataset.tizimda) || 0;
+      const haqiqiy = Number(inp.value) || 0;
+      const farq    = haqiqiy - tizimda;
+      const key     = inp.dataset.nom.replace(/\W/g, '_');
+      const diffEl  = document.getElementById('diff-' + key);
+      const card    = document.getElementById('card-' + key);
+      if (diffEl) {
+        diffEl.textContent = farq > 0 ? '+' + farq : String(farq);
+        diffEl.className   = 'item-diff' + (farq > 0 ? ' pos' : farq < 0 ? ' neg' : '');
+      }
+      if (card) {
+        card.className = 'item-card' + (farq > 0 ? ' changed-pos' : farq < 0 ? ' changed-neg' : '');
+      }
+      updateProgress();
+    }
+
+    function updateProgress() {
+      let edited = 0;
+      document.querySelectorAll('.item-input').forEach(inp => {
+        if (Number(inp.value) !== Number(inp.dataset.tizimda)) edited++;
+      });
+      const total = document.querySelectorAll('.item-input').length;
+      const pct   = total ? Math.round(edited / total * 100) : 0;
+      document.getElementById('progressPill').textContent = `${edited} / ${total} o'zgarish`;
+      document.getElementById('progFill').style.width = pct + '%';
+    }
+
+    // ── SUBMIT ─────────────────────────────────────────────────────────────
+    async function submitInventar() {
+      const items = [];
+      document.querySelectorAll('.item-input').forEach(inp => {
+        items.push({ mahsulot: inp.dataset.nom, haqiqiy: Number(inp.value) || 0 });
+      });
+
+      const btn = document.getElementById('btnSubmit');
+      btn.textContent = '⏳ Saqlanmoqda...';
+      btn.disabled    = true;
+
+      try {
+        const res  = await fetch(`${baseUrl}/api/warehouse/mobile/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, items })
+        });
+        const data = await res.json();
+
+        if (!data.ok) {
+          alert('Xato: ' + data.error);
+          btn.textContent = '✅ INVENTARIZATSIYANI TUGATISH';
+          btn.disabled    = false;
+          return;
+        }
+
+        lastResult = data;
+
+        // Auto-download Excel
+        if (data.excelFile) downloadBlob(data.excelFile, data.fileName);
+
+        // Show results
+        document.getElementById('itemList').style.display = 'none';
+        document.querySelector('.search-wrap').style.display = 'none';
+        document.querySelector('.prog-bar-wrap').style.display = 'none';
+        document.getElementById('footerBar').style.display = 'none';
+        document.getElementById('resultSection').style.display = 'block';
+
+        renderResults(data);
+      } catch (e) {
+        alert('Xato: ' + e.message);
+        btn.textContent = '✅ INVENTARIZATSIYANI TUGATISH';
+        btn.disabled    = false;
+      }
+    }
+
+    function renderResults(data) {
+      const list = document.getElementById('resultList');
+      if (!data.diffs || !data.diffs.length) {
+        list.innerHTML = '<div class="no-diffs">✅ Farqlar yo\'q! Hammasi to\'g\'ri.</div>';
+        return;
+      }
+      list.innerHTML = data.diffs.map(d => `
+        <div class="result-item">
+          <span>${d.mahsulot}</span>
+          <span class="result-farq ${d.farq > 0 ? 'pos' : 'neg'}">
+            ${d.farq > 0 ? '+' : ''}${d.farq} ta × ${(d.narx||0).toLocaleString()} = ${(Math.abs(d.farq)*(d.narx||0)).toLocaleString()} so'm
+          </span>
+        </div>
+      `).join('');
+      const total = data.diffs.reduce((s, d) => s + (Math.abs(d.farq) * (d.narx||0)), 0);
+      list.innerHTML += `<div class="result-total"><span>JAMI FARQ SUMMA:</span><span>${total.toLocaleString()} so'm</span></div>`;
+      if (data.excelFile) document.getElementById('btnDownload').style.display = 'block';
+    }
+
+    function downloadBlob(base64, fileName) {
+      const blob = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const url  = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+      const a    = document.createElement('a');
+      a.href     = url; a.download = fileName || 'inventarizatsiya.xlsx'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadExcel() {
+      if (!lastResult?.excelFile) return;
+      downloadBlob(lastResult.excelFile, lastResult.fileName);
+    }
+
+    function closePage() {
+      document.body.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;background:#0f172a;">
+          <div style="font-size:56px;margin-bottom:16px">🤝</div>
+          <div style="font-size:22px;color:#34d399;font-weight:700;margin-bottom:8px">Rahmat!</div>
+          <div style="color:#64748b;font-size:14px">Inventarizatsiya muvaffaqiyatli yakunlandi</div>
+        </div>
+      `;
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

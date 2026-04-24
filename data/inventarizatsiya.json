@@ -1,0 +1,325 @@
+[
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 400,
+        "haqiqiy": 350,
+        "farq": -50,
+        "narx": 12212,
+        "summa": 610600
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_00F9D491",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T05:40:51.227Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 350,
+        "haqiqiy": 345,
+        "farq": -5,
+        "narx": 12212,
+        "summa": 61060
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_2E7B842E",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T05:47:02.959Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 345,
+        "haqiqiy": 343,
+        "farq": -2,
+        "narx": 12212,
+        "summa": 24424
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_A9D82080",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T05:50:59.697Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 343,
+        "haqiqiy": 342,
+        "farq": -1,
+        "narx": 12212,
+        "summa": 12212
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_9580DB13",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T05:58:20.727Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 342,
+        "haqiqiy": 341,
+        "farq": -1,
+        "narx": 12212,
+        "summa": 12212
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_E3118858",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:01:10.881Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 341,
+        "haqiqiy": 339,
+        "farq": -2,
+        "narx": 12212,
+        "summa": 24424
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_C1082F8C",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:04:05.137Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 339,
+        "haqiqiy": 338,
+        "farq": -1,
+        "narx": 12212,
+        "summa": 12212
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_9C3DE7DD",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:09:14.671Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 338,
+        "haqiqiy": 337,
+        "farq": -1,
+        "narx": 12212,
+        "summa": 12212
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_58F493BC",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:12:57.413Z"
+  },
+  {
+    "obyekt": "Abyekt 1",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 50,
+        "haqiqiy": 49,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_4905DB84",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:18:45.910Z"
+  },
+  {
+    "obyekt": "Abyekt 1",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 49,
+        "haqiqiy": 48,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_752FDD16",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:25:43.640Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 337,
+        "haqiqiy": 333,
+        "farq": -4,
+        "narx": 12212,
+        "summa": 48848
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_90D95B28",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:37:49.635Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 333,
+        "haqiqiy": 332,
+        "farq": -1,
+        "narx": 12212,
+        "summa": 12212
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_EE262423",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T06:42:37.968Z"
+  },
+  {
+    "obyekt": "Barchasi",
+    "itemsCount": 4,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimdagi": 34,
+        "haqiqiy": 33,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_F25DFF9F",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T09:15:28.600Z"
+  },
+  {
+    "obyekt": "Barchasi",
+    "itemsCount": 4,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "asas",
+        "tizimdagi": 1212,
+        "haqiqiy": 1210,
+        "farq": -2,
+        "narx": 1212,
+        "summa": 2424
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_1654F213",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T09:17:02.374Z"
+  },
+  {
+    "obyekt": "Abyekt 1",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 43,
+        "haqiqiy": 42,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_5A4A5739",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T11:39:38.770Z"
+  },
+  {
+    "obyekt": "Abyekt 1",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 42,
+        "haqiqiy": 41,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_469C1F62",
+    "sana": "17/04/2026",
+    "createdAt": "2026-04-17T11:41:31.973Z"
+  },
+  {
+    "obyekt": "abyekt 2",
+    "itemsCount": 1,
+    "diffsCount": 1,
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 332,
+        "haqiqiy": 330,
+        "farq": -2,
+        "narx": 12212,
+        "summa": 24424
+      }
+    ],
+    "operator": "jamoliddin",
+    "id": "INV_B54443E0",
+    "sana": "18/04/2026",
+    "createdAt": "2026-04-18T07:35:36.184Z"
+  }
+]
