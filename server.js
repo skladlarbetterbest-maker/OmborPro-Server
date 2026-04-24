@@ -2,6 +2,7 @@
  * OmborPro v3.0 — Node.js Server
  * Ko'p tarmoqli backend, Express asosida
  */
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
