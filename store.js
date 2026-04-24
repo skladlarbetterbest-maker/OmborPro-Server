@@ -31,6 +31,106 @@ async function query(text, params) {
   }
 }
 
+async function initTables() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS users (
+      login VARCHAR(100) PRIMARY KEY,
+      pass VARCHAR(255),
+      telegram_id VARCHAR(50),
+      block VARCHAR(1) DEFAULT 'E',
+      active BOOLEAN DEFAULT true,
+      role VARCHAR(20) DEFAULT 'free',
+      obyekt VARCHAR(100) DEFAULT 'Barchasi',
+      ombor VARCHAR(100) DEFAULT 'Barchasi',
+      can_edit_jurnal BOOLEAN DEFAULT true,
+      can_delete_jurnal BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS jurnal (
+      id VARCHAR(50) PRIMARY KEY,
+      sana VARCHAR(20),
+      tur VARCHAR(10),
+      mahsulot VARCHAR(255),
+      miqdor DECIMAL(15,2),
+      narx DECIMAL(15,2),
+      summa DECIMAL(15,2),
+      tomon VARCHAR(255),
+      obyekt VARCHAR(100),
+      izoh TEXT,
+      operator VARCHAR(100),
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS history (
+      id VARCHAR(50) PRIMARY KEY,
+      action VARCHAR(20),
+      source_id VARCHAR(50),
+      sana VARCHAR(20),
+      tur VARCHAR(10),
+      mahsulot VARCHAR(255),
+      miqdor DECIMAL(15,2),
+      narx DECIMAL(15,2),
+      summa DECIMAL(15,2),
+      obyekt VARCHAR(100),
+      izoh TEXT,
+      operator VARCHAR(100),
+      changed_by VARCHAR(100),
+      changed_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS katalog (
+      id VARCHAR(50) PRIMARY KEY,
+      nom VARCHAR(255) UNIQUE,
+      olv VARCHAR(50),
+      active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`CREATE TABLE IF NOT EXISTS obyektlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
+  await query(`CREATE TABLE IF NOT EXISTS omborlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
+  await query(`
+    CREATE TABLE IF NOT EXISTS firms (
+      id VARCHAR(50) PRIMARY KEY,
+      name VARCHAR(255) UNIQUE,
+      phone VARCHAR(50),
+      address TEXT,
+      inn VARCHAR(50),
+      note TEXT,
+      active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await query(`CREATE TABLE IF NOT EXISTS settings (key VARCHAR(100) PRIMARY KEY, value TEXT)`);
+
+  const users = await query('SELECT * FROM users WHERE login = $1', ['jamoliddin']);
+  if (users.rows.length === 0) {
+    await query(`
+      INSERT INTO users (login, pass, block, active, role, obyekt, ombor, can_edit_jurnal, can_delete_jurnal)
+      VALUES ('jamoliddin', '122', 'E', true, 'admin', 'Barchasi', 'Barchasi', true, true)
+    `);
+  }
+
+  const obyektlar = await query("SELECT * FROM obyektlar WHERE name = 'Barchasi'");
+  if (obyektlar.rows.length === 0) {
+    await query("INSERT INTO obyektlar (name) VALUES ('Barchasi')");
+  }
+
+  const omborlar = await query("SELECT * FROM omborlar WHERE name = 'Barchasi'");
+  if (omborlar.rows.length === 0) {
+    await query("INSERT INTO omborlar (name) VALUES ('Barchasi')");
+  }
+}
+
+initTables().catch(console.error);
+
 async function readData(fileName) {
   return null;
 }
