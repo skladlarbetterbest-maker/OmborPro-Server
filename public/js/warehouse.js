@@ -107,6 +107,7 @@ const Warehouse = {
 
     this.renderInventarItems();
     this.renderInventarHistory();
+    this.initResizeHandle();
   },
 
   filterInventarItems() {
@@ -478,5 +479,70 @@ const Warehouse = {
     } catch (e) {
       alert('Xato: ' + e.message);
     }
+  },
+
+  // ─── RESIZE HANDLE ───────────────────────────────────────────────────────
+  initResizeHandle() {
+    const handle = document.getElementById('inventar-resize-handle');
+    const leftPanel = document.querySelector('.inventar-left-panel');
+    const rightPanel = document.querySelector('.inventar-right-panel');
+    const container = document.querySelector('.inventar-resize-container');
+
+    if (!handle || !leftPanel || !rightPanel || !container) return;
+
+    let isResizing = false;
+    let startX = 0;
+    let startLeftWidth = 0;
+    let startRightWidth = 0;
+
+    handle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startLeftWidth = leftPanel.offsetWidth;
+      startRightWidth = rightPanel.offsetWidth;
+      handle.classList.add('active');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+
+      const deltaX = e.clientX - startX;
+      const containerWidth = container.offsetWidth;
+      const gap = 12; // gap size
+
+      let newLeftWidth = startLeftWidth + deltaX;
+      let newRightWidth = startRightWidth - deltaX;
+
+      // Minimum width constraints
+      const minWidth = 300;
+      if (newLeftWidth < minWidth) {
+        newLeftWidth = minWidth;
+        newRightWidth = containerWidth - gap - minWidth;
+      }
+      if (newRightWidth < minWidth) {
+        newRightWidth = minWidth;
+        newLeftWidth = containerWidth - gap - minWidth;
+      }
+
+      // Convert to flex ratios
+      const totalWidth = newLeftWidth + newRightWidth + gap;
+      const leftFlex = newLeftWidth / totalWidth;
+      const rightFlex = newRightWidth / totalWidth;
+
+      leftPanel.style.flex = leftFlex.toFixed(4);
+      rightPanel.style.flex = rightFlex.toFixed(4);
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isResizing) {
+        isResizing = false;
+        handle.classList.remove('active');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
   }
 };

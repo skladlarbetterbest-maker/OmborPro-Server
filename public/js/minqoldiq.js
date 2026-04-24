@@ -98,12 +98,44 @@ const MinQoldiq = {
   populateObyektFilter() {
     const select = document.getElementById('minq-obyekt-filter');
     if (!select) return;
-    const obyektlar = App.data.obyektlar || ['Barchasi'];
+    let obyektlar = App.data.obyektlar || ['Barchasi'];
     const user = App.currentUser;
-    const userObyekt = user?.obyekt || 'Barchasi';
+    let userObyekt = user?.obyekt || 'Barchasi';
+
+    // Obyektlarni arrayga aylantirish
+    if (typeof obyektlar === 'string') {
+      obyektlar = obyektlar.split(',').map(o => o.trim());
+    }
+    if (Array.isArray(obyektlar)) {
+      obyektlar = obyektlar.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    obyektlar = Array.from(new Set(obyektlar));
+
+    // User obyektni ham arrayga aylantirish
+    if (typeof userObyekt === 'string') {
+      if (userObyekt.includes(',')) {
+        userObyekt = userObyekt.split(',').map(o => o.trim());
+      } else {
+        userObyekt = [userObyekt];
+      }
+    }
+    if (Array.isArray(userObyekt)) {
+      userObyekt = userObyekt.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    userObyekt = Array.from(new Set(userObyekt));
 
     select.innerHTML = obyektlar
-      .filter(o => userObyekt === 'Barchasi' || o === userObyekt || o === 'Barchasi')
+      .filter(o => userObyekt.includes('Barchasi') || userObyekt.includes(o) || o === 'Barchasi')
       .map(o => `<option value="${o}">${o}</option>`).join('');
   }
 };

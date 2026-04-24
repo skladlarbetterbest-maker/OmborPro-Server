@@ -9,13 +9,47 @@ const Reports = {
   populateObyekt() {
     const el = document.getElementById('report-obyekt');
     if (!el) return;
-    const obyektlar = App.data.obyektlar || ['Barchasi'];
-    const allowed = App.currentUser?.obyekt || 'Barchasi';
-    const isAdmin = App.getUserRole() === 'admin';
-    
+    let obyektlar = App.data.obyektlar || ['Barchasi'];
+
+    // Obyektlarni arrayga aylantirish (agar string bo'lsa)
+    if (typeof obyektlar === 'string') {
+      obyektlar = obyektlar.split(',').map(o => o.trim());
+    }
+    // Array bo'lsa, lekin ichida string bo'lsa
+    if (Array.isArray(obyektlar)) {
+      obyektlar = obyektlar.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    obyektlar = Array.from(new Set(obyektlar)); // Dublikatlarni olib tashlash
+
+    let allowed = App.currentUser?.obyekt || 'Barchasi';
+    // Allowed obyektni ham arrayga aylantirish
+    if (typeof allowed === 'string') {
+      if (allowed.includes(',')) {
+        allowed = allowed.split(',').map(o => o.trim());
+      } else {
+        allowed = [allowed];
+      }
+    }
+    if (Array.isArray(allowed)) {
+      allowed = allowed.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    allowed = Array.from(new Set(allowed));
+
+    const isAdmin = App.getUserRole() === 'admin' || App.getUserRole() === 'owner';
+
     let opts;
-    if (!isAdmin && allowed !== 'Barchasi') {
-      opts = `<option value="${allowed}">${allowed}</option>`;
+    if (!isAdmin && !allowed.includes('Barchasi')) {
+      opts = obyektlar.filter(o => allowed.includes(o)).map(o => `<option value="${o}">${o}</option>`).join('');
     } else {
       opts = '<option value="Barchasi">Barchasi</option>' + obyektlar.filter(o=>o!=='Barchasi').map(o => `<option value="${o}">${o}</option>`).join('');
     }

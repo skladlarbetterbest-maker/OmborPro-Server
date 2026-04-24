@@ -23,8 +23,18 @@ function authMiddleware(req, res, next) {
  * Admin tekshirish
  */
 function adminOnly(req, res, next) {
-  if (!req.user || req.user.role !== 'admin') {
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'owner')) {
     return res.status(403).json({ ok: false, error: 'Faqat admin uchun' });
+  }
+  next();
+}
+
+/**
+ * Owner tekshirish (faqat owner)
+ */
+function ownerOnly(req, res, next) {
+  if (!req.user || req.user.role !== 'owner') {
+    return res.status(403).json({ ok: false, error: 'Faqat owner uchun' });
   }
   next();
 }
@@ -33,7 +43,7 @@ function adminOnly(req, res, next) {
  * Minimum role tekshirish
  */
 function minRole(minRoleName) {
-  const hierarchy = { free: 0, pro: 1, 'pro+': 2, admin: 3 };
+  const hierarchy = { free: 0, pro: 1, 'pro+': 2, admin: 3, owner: 4 };
   return (req, res, next) => {
     const userLevel = hierarchy[req.user?.role] || 0;
     const requiredLevel = hierarchy[minRoleName] || 0;
@@ -44,4 +54,4 @@ function minRole(minRoleName) {
   };
 }
 
-module.exports = { authMiddleware, adminOnly, minRole };
+module.exports = { authMiddleware, adminOnly, ownerOnly, minRole };

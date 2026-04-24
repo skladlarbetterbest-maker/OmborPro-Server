@@ -249,9 +249,10 @@
                                 <div id="kirim-new-firm-form" style="display:none; background:rgba(30,41,59,0.5); padding:16px; border-radius:8px; margin-top:8px; border:1px solid var(--border)">
                                     <div style="font-size:12px; font-weight:bold; margin-bottom:12px; color:var(--accent-light)">Yangi firma qo'shish</div>
                                     <input class="f-input" id="knf-nom" placeholder="Firma nomi" style="margin-bottom:8px">
+                                    <input class="f-input" id="knf-inn" placeholder="INN" style="margin-bottom:8px">
+                                    <input class="f-input" id="knf-telegram" placeholder="Telegram ID" style="margin-bottom:8px">
                                     <input class="f-input" id="knf-phone" placeholder="Telefon (+998...)" style="margin-bottom:8px">
-                                    <input class="f-input" id="knf-address" placeholder="Manzil" style="margin-bottom:8px">
-                                    <input class="f-input" id="knf-inn" placeholder="INN" style="margin-bottom:12px">
+                                    <input class="f-input" id="knf-address" placeholder="Manzil" style="margin-bottom:12px">
                                     <div style="display:flex;gap:8px;justify-content:flex-end">
                                         <button class="btn btn-sm btn-outline" onclick="document.getElementById('kirim-new-firm-form').style.display='none'">Bekor qilish</button>
                                         <button class="btn btn-sm btn-primary" onclick="KirimChiqim.saveNewFirm()">Saqlash</button>
@@ -474,11 +475,11 @@
 
                 <!-- ===== INVENTARIZATSIYA TAB ===== -->
                 <div class="tab-panel" id="tab-inventar">
-                    <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px;">
+                    <div class="inventar-resize-container" style="display:flex; gap:12px; align-items:stretch;">
 
                         <!-- LEFT: Inventar Form -->
-                        <div>
-                            <div class="card mb-24">
+                        <div class="inventar-left-panel" style="flex:1.4; min-width:300px;">
+                            <div class="card mb-24" style="height:100%; display:flex; flex-direction:column;">
                                 <div class="card-header">
                                     <div>
                                         <div class="card-title">📦 Inventarizatsiya</div>
@@ -495,7 +496,7 @@
                                 </div>
 
                                 <!-- Items list -->
-                                <div id="inventar-items" style="max-height:calc(100vh - 340px); overflow-y:auto; margin:0 -4px; padding:0 4px;"></div>
+                                <div id="inventar-items" style="flex:1; overflow-y:auto; margin:0 -4px; padding:0 4px;"></div>
 
                                 <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:flex; gap:8px;">
                                     <button class="btn btn-primary" style="flex:1" onclick="Warehouse.submitInventar()">✅ SAQLASH</button>
@@ -504,10 +505,13 @@
                             </div>
                         </div>
 
+                        <!-- RESIZE HANDLE -->
+                        <div class="resize-handle" id="inventar-resize-handle"></div>
+
                         <!-- RIGHT: Links + History -->
-                        <div>
+                        <div class="inventar-right-panel" style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:12px;">
                             <!-- Mobile Link Card -->
-                            <div class="card mb-24">
+                            <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
                                 <div class="card-header">
                                     <div>
                                         <div class="card-title">📱 Telefon Linki</div>
@@ -534,7 +538,7 @@
                                 </div>
 
                                 <!-- Links Table -->
-                                <div class="table-wrap" style="max-height:220px;overflow-y:auto;">
+                                <div class="table-wrap" style="flex:1; overflow-y:auto; min-height:0;">
                                     <table>
                                         <thead>
                                             <tr>
@@ -553,15 +557,15 @@
                             </div>
 
                             <!-- History Card -->
-                            <div class="card">
+                            <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
                                 <div class="card-header">
                                     <div>
                                         <div class="card-title">🗂️ Inventarizatsiya Tarixi</div>
                                     </div>
                                     <button class="btn btn-sm btn-outline" onclick="Warehouse.toggleHistory()" id="inv-history-toggle-btn">▼ Yashirish</button>
                                 </div>
-                                <div id="inv-history-section">
-                                    <div class="table-wrap" style="max-height:260px;overflow-y:auto;">
+                                <div id="inv-history-section" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+                                    <div class="table-wrap" style="flex:1; overflow-y:auto; min-height:0;">
                                         <table>
                                             <thead>
                                                 <tr>
@@ -740,7 +744,10 @@
                     <div class="card mb-24">
                         <div class="card-header">
                             <div><div class="card-title">👑 Admin Panel</div><div class="card-subtitle">Foydalanuvchilarni boshqarish</div></div>
-                            <button class="btn btn-primary btn-sm" onclick="Admin.showAddUser()">+ Yangi Foydalanuvchi</button>
+                            <div style="display:flex;gap:8px">
+                                <button class="btn btn-primary btn-sm" onclick="Admin.showAddUser()">+ Yangi Foydalanuvchi</button>
+                                <button class="btn btn-green btn-sm" onclick="Admin.saveAllChanges()">💾 Barchasini Saqlash</button>
+                            </div>
                         </div>
                         <div class="user-mgmt-card" id="admin-users-grid"></div>
                     </div>

@@ -138,10 +138,11 @@ const KirimChiqim = {
   async saveNewFirm() {
     const name = document.getElementById('knf-nom').value.trim();
     if (!name) return Utils.showMsg('k-msg', 'Firma nomi kiritilishi shart!', 'err');
+    const inn = document.getElementById('knf-inn').value.trim();
+    const telegram = document.getElementById('knf-telegram').value.trim();
     const phone = document.getElementById('knf-phone').value.trim();
     const address = document.getElementById('knf-address').value.trim();
-    const inn = document.getElementById('knf-inn').value.trim();
-    const res = await API.post('/api/settings/firms', { name, phone, address, inn });
+    const res = await API.post('/api/settings/firms', { name, inn, telegram, phone, address });
     if (res.ok) {
        document.getElementById('kirim-new-firm-form').style.display = 'none';
        document.getElementById('k-yetkazuvchi').value = name;

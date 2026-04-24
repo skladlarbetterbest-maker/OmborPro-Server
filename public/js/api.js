@@ -3,7 +3,7 @@
  */
 const API = {
   token: localStorage.getItem('token') || '',
-  baseUrl: 'https://omborpro-server-1.onrender.com',
+  baseUrl: 'http://localhost:3000',
 
   headers() {
     const h = { 'Content-Type': 'application/json' };
@@ -58,6 +58,9 @@ const API = {
   },
 
   // ── Journal ──
+  async addJournal(data) {
+    return this.post('/api/journal', data);
+  },
   async addJournalBulk(records) {
     return this.post('/api/journal/bulk', { records });
   },
@@ -82,6 +85,10 @@ const API = {
   async addOmbor(name) { return this.post('/api/settings/omborlar', { name }); },
   async deleteOmbor(name) { return this.del('/api/settings/omborlar/' + encodeURIComponent(name)); },
   async deleteFirm(name) { return this.del('/api/settings/firms/' + encodeURIComponent(name)); },
+  async addProduct(nom, olv) { return this.post('/api/settings/products', { nom, olv }); },
+  async addProductPublic(nom, olv) { return this.post('/api/settings/products/public', { nom, olv }); },
+  async addFirma(name, inn, telegram, phone, address) { return this.post('/api/settings/firms', { name, inn, telegram, phone, address }); },
+  async addFirmaPublic(name, inn, telegram, phone, address) { return this.post('/api/settings/firms/public', { name, inn, telegram, phone, address }); },
 
   // ── Warehouse ──
   async doTransfer(data) { return this.post('/api/warehouse/transfers', data); },

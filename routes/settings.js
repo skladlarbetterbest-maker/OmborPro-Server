@@ -70,14 +70,22 @@ router.post('/min-stock', authMiddleware, async (req, res) => {
 });
 
 // ── Firms ──
-router.post('/firms', authMiddleware, async (req, res) => {
-  const { name, phone, address, inn, note, oldName } = req.body;
+router.post('/firms', authMiddleware, adminOnly, async (req, res) => {
+  const { name, inn, telegram, phone, address, note, oldName } = req.body;
   if (!name) return res.status(400).json({ ok: false, error: 'Firma nomi kerak' });
-  const result = await store.upsertFirm(name, { phone: phone || '', address: address || '', inn: inn || '', note: note || '', oldName });
+  const result = await store.upsertFirm(name, { inn: inn || '', telegram: telegram || '', phone: phone || '', address: address || '', note: note || '', oldName });
   res.json({ ok: true, data: result });
 });
 
-router.delete('/firms/:name', authMiddleware, async (req, res) => {
+// Firms - hamma uchun ochiq (jurnal tahrirlash uchun)
+router.post('/firms/public', authMiddleware, async (req, res) => {
+  const { name, inn, telegram, phone, address } = req.body;
+  if (!name) return res.status(400).json({ ok: false, error: 'Firma nomi kerak' });
+  const result = await store.upsertFirm(name, { inn: inn || '', telegram: telegram || '', phone: phone || '', address: address || '', note: '', oldName: '' });
+  res.json({ ok: true, data: result });
+});
+
+router.delete('/firms/:name', authMiddleware, adminOnly, async (req, res) => {
   const { name } = req.params;
   if (!name) return res.status(400).json({ ok: false, error: 'Firma nomi kerak' });
   await store.deleteFirm(decodeURIComponent(name));
@@ -85,14 +93,22 @@ router.delete('/firms/:name', authMiddleware, async (req, res) => {
 });
 
 // ── Products (Katalog) ──
-router.post('/products', authMiddleware, async (req, res) => {
+router.post('/products', authMiddleware, adminOnly, async (req, res) => {
   const { nom, olv, oldNom } = req.body;
   if (!nom) return res.status(400).json({ ok: false, error: 'Mahsulot nomi kerak' });
   const result = await store.upsertProduct(nom, olv, oldNom);
   res.json({ ok: true, data: result });
 });
 
-router.post('/products/delete', authMiddleware, async (req, res) => {
+// Products - hamma uchun ochiq (jurnal tahrirlash uchun)
+router.post('/products/public', authMiddleware, async (req, res) => {
+  const { nom, olv } = req.body;
+  if (!nom) return res.status(400).json({ ok: false, error: 'Mahsulot nomi kerak' });
+  const result = await store.upsertProduct(nom, olv, '');
+  res.json({ ok: true, data: result });
+});
+
+router.post('/products/delete', authMiddleware, adminOnly, async (req, res) => {
   const { nom } = req.body;
   if (!nom) return res.status(400).json({ ok: false, error: 'Mahsulot nomi kerak' });
   await store.deleteProduct(nom);

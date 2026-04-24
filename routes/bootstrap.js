@@ -10,7 +10,7 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const userRole = req.user.role;
     const user = await store.getUser(req.user.login) || {};
-    const isAdmin = userRole === 'admin';
+    const isAdmin = userRole === 'admin' || userRole === 'owner';
     const allowedObyekt = user.obyekt || 'Barchasi';
 
     const users = await store.getUsers();

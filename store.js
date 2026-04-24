@@ -5,8 +5,12 @@ const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  user: 'postgres',
+  host: 'localhost',
+  database: 'omborpro',
+  password: '0',
+  port: 5432,
+  ssl: false
 });
 
 function uid(prefix = '') {
@@ -35,7 +39,7 @@ async function initTables() {
   await query(`CREATE TABLE IF NOT EXISTS users (
     login VARCHAR(100) PRIMARY KEY, pass VARCHAR(255), telegram_id VARCHAR(50),
     block VARCHAR(1) DEFAULT 'E', active BOOLEAN DEFAULT true, role VARCHAR(20) DEFAULT 'free',
-    obyekt VARCHAR(100) DEFAULT 'Barchasi', ombor VARCHAR(100) DEFAULT 'Barchasi',
+    obyekt JSONB DEFAULT '["Barchasi"]'::jsonb, ombor VARCHAR(100) DEFAULT 'Barchasi',
     can_edit_jurnal BOOLEAN DEFAULT true, can_delete_jurnal BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
@@ -58,9 +62,9 @@ async function initTables() {
   await query(`CREATE TABLE IF NOT EXISTS obyektlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
   await query(`CREATE TABLE IF NOT EXISTS omborlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
   await query(`CREATE TABLE IF NOT EXISTS firms (
-    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255) UNIQUE, phone VARCHAR(50),
-    address TEXT, inn VARCHAR(50), note TEXT, active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
+    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255) UNIQUE, inn VARCHAR(50),
+    telegram VARCHAR(100), phone VARCHAR(50), address TEXT, note TEXT,
+    active BOOLEAN DEFAULT true, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
   await query(`CREATE TABLE IF NOT EXISTS settings (key VARCHAR(100) PRIMARY KEY, value TEXT)`);
   await query(`CREATE TABLE IF NOT EXISTS inv_links (
@@ -94,7 +98,7 @@ async function initTables() {
   await query(`CREATE TABLE IF NOT EXISTS users (
     login VARCHAR(100) PRIMARY KEY, pass VARCHAR(255), telegram_id VARCHAR(50),
     block VARCHAR(1) DEFAULT 'E', active BOOLEAN DEFAULT true, role VARCHAR(20) DEFAULT 'free',
-    obyekt VARCHAR(100) DEFAULT 'Barchasi', ombor VARCHAR(100) DEFAULT 'Barchasi',
+    obyekt JSONB DEFAULT '["Barchasi"]'::jsonb, ombor VARCHAR(100) DEFAULT 'Barchasi',
     can_edit_jurnal BOOLEAN DEFAULT true, can_delete_jurnal BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
@@ -123,9 +127,9 @@ async function initTables() {
   await query(`CREATE TABLE IF NOT EXISTS omborlar (id SERIAL PRIMARY KEY, name VARCHAR(100) UNIQUE)`);
   // Firms
   await query(`CREATE TABLE IF NOT EXISTS firms (
-    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255) UNIQUE, phone VARCHAR(50),
-    address TEXT, inn VARCHAR(50), note TEXT, active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
+    id VARCHAR(50) PRIMARY KEY, name VARCHAR(255) UNIQUE, inn VARCHAR(50),
+    telegram VARCHAR(100), phone VARCHAR(50), address TEXT, note TEXT,
+    active BOOLEAN DEFAULT true, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
   )`);
   // Settings
   await query(`CREATE TABLE IF NOT EXISTS settings (key VARCHAR(100) PRIMARY KEY, value TEXT)`);
@@ -240,14 +244,22 @@ async function upsertUser(login, userData) {
   const block = userData.block !== undefined ? userData.block : (existing.block || 'E');
   const active = userData.active !== undefined ? userData.active : (existing.active ?? true);
   const role = userData.role !== undefined ? userData.role : (existing.role || 'free');
-  const obyekt = userData.obyekt !== undefined ? userData.obyekt : (existing.obyekt || 'Barchasi');
+
+  // Obyektni JSONB sifatida saqlash
+  let obyektValue = userData.obyekt !== undefined ? userData.obyekt : (existing.obyekt || ['Barchasi']);
+  if (typeof obyektValue === 'string') {
+    obyektValue = [obyektValue];
+  }
+  // Array ni JSON stringiga aylantirish
+  const obyektJson = JSON.stringify(obyektValue);
+
   const ombor = userData.ombor !== undefined ? userData.ombor : (existing.ombor || 'Barchasi');
   const can_edit_jurnal = userData.can_edit_jurnal !== undefined ? userData.can_edit_jurnal : (existing.can_edit_jurnal ?? false);
   const can_delete_jurnal = userData.can_delete_jurnal !== undefined ? userData.can_delete_jurnal : (existing.can_delete_jurnal ?? false);
 
   const res = await query(`
     INSERT INTO users (login, pass, telegram_id, block, active, role, obyekt, ombor, can_edit_jurnal, can_delete_jurnal, updated_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+    VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, NOW())
     ON CONFLICT (login) DO UPDATE SET
       pass = EXCLUDED.pass,
       telegram_id = EXCLUDED.telegram_id,
@@ -260,7 +272,7 @@ async function upsertUser(login, userData) {
       can_delete_jurnal = EXCLUDED.can_delete_jurnal,
       updated_at = NOW()
     RETURNING *
-  `, [login, pass || '', telegram_id || '', block, active, role, obyekt, ombor, can_edit_jurnal, can_delete_jurnal]);
+  `, [login, pass || '', telegram_id || '', block, active, role, obyektJson, ombor, can_edit_jurnal, can_delete_jurnal]);
   return res.rows[0];
 }
 
@@ -396,28 +408,30 @@ async function getFirms() {
 
 async function upsertFirm(name, data) {
   const id = uid('FRM');
-  const { phone, address, inn, note, oldName } = data || {};
-  
+  const { inn, telegram, phone, address, note, oldName } = data || {};
+
   if (oldName) {
     const res = await query(`
-      UPDATE firms SET name = $1, phone = COALESCE($2, phone), address = COALESCE($3, address),
-      inn = COALESCE($4, inn), note = COALESCE($5, note), updated_at = NOW()
-      WHERE LOWER(name) = LOWER($6) RETURNING *
-    `, [clean(name), phone, address, inn, note, oldName]);
+      UPDATE firms SET name = $1, inn = COALESCE($2, inn), telegram = COALESCE($3, telegram),
+      phone = COALESCE($4, phone), address = COALESCE($5, address),
+      note = COALESCE($6, note), updated_at = NOW()
+      WHERE LOWER(name) = LOWER($7) RETURNING *
+    `, [clean(name), inn, telegram, phone, address, note, oldName]);
     if (res.rows[0]) return res.rows[0];
   }
-  
+
   const res = await query(`
-    INSERT INTO firms (id, name, phone, address, inn, note, active, created_at)
-    VALUES ($1, $2, $3, $4, $5, $6, true, NOW())
+    INSERT INTO firms (id, name, inn, telegram, phone, address, note, active, created_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())
     ON CONFLICT (name) DO UPDATE SET
-      phone = COALESCE($3, firms.phone),
-      address = COALESCE($4, firms.address),
-      inn = COALESCE($5, firms.inn),
-      note = COALESCE($6, firms.note),
+      inn = COALESCE($3, firms.inn),
+      telegram = COALESCE($4, firms.telegram),
+      phone = COALESCE($5, firms.phone),
+      address = COALESCE($6, firms.address),
+      note = COALESCE($7, firms.note),
       updated_at = NOW()
     RETURNING *
-  `, [id, clean(name), phone || '', address || '', inn || '', note || '']);
+  `, [id, clean(name), inn || '', telegram || '', phone || '', address || '', note || '']);
   return res.rows[0];
 }
 

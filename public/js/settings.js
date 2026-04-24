@@ -5,7 +5,21 @@ const Settings = {
   renderObyektlar() {
     const list = document.getElementById('settings-obyektlar-list');
     if (!list) return;
-    list.innerHTML = (App.data.obyektlar || []).map(obj => `
+    let obyektlar = App.data.obyektlar || [];
+    // Obyektlarni arrayga aylantirish
+    if (typeof obyektlar === 'string') {
+      obyektlar = obyektlar.split(',').map(o => o.trim());
+    }
+    if (Array.isArray(obyektlar)) {
+      obyektlar = obyektlar.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    obyektlar = Array.from(new Set(obyektlar));
+    list.innerHTML = obyektlar.map(obj => `
       <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(30,41,59,0.5);padding:10px 14px;border-radius:var(--radius-sm);">
         <span>${obj}</span>
         ${obj !== 'Barchasi' ? `<button class="btn btn-sm btn-outline" style="padding:4px 8px;font-size:10px;color:var(--red);border-color:var(--red)" onclick="Settings.deleteObyekt('${obj}')">X</button>` : ''}

@@ -122,12 +122,14 @@ const App = {
     document.getElementById('current-date').textContent = now.toLocaleDateString('uz-UZ', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
     // Admin-only menus
-    document.getElementById('nav-admin').style.display = role === 'admin' ? 'flex' : 'none';
-    document.getElementById('nav-tarix').style.display = role === 'admin' ? 'flex' : 'none';
+    console.log('🔍 Debug - Role:', role, 'User:', user.login);
+    console.log('🔍 Debug - nav-admin element:', document.getElementById('nav-admin'));
+    document.getElementById('nav-admin').style.display = (role === 'admin' || role === 'owner') ? 'flex' : 'none';
+    document.getElementById('nav-tarix').style.display = (role === 'admin' || role === 'owner') ? 'flex' : 'none';
 
     // Admin-only settings sections
-    document.getElementById('admin-obyekt-section').style.display = role === 'admin' ? 'block' : 'none';
-    document.getElementById('admin-ombor-section').style.display = role === 'admin' ? 'block' : 'none';
+    document.getElementById('admin-obyekt-section').style.display = (role === 'admin' || role === 'owner') ? 'block' : 'none';
+    document.getElementById('admin-ombor-section').style.display = (role === 'admin' || role === 'owner') ? 'block' : 'none';
 
     // Hide new firm button for non-admins in Kirim form
     const newFirmBtns = document.querySelectorAll('.new-firm-btn');
@@ -218,12 +220,49 @@ const App = {
 
   populateObyektFilters() {
     let obyektlar = this.data.obyektlar || ['Barchasi'];
+    console.log('🔍 Debug - Obyektlar (raw):', obyektlar, 'Type:', typeof obyektlar, 'IsArray:', Array.isArray(obyektlar));
+
+    // Obyektlarni arrayga aylantirish (agar string bo'lsa)
+    if (typeof obyektlar === 'string') {
+      obyektlar = obyektlar.split(',').map(o => o.trim());
+    }
+    // Array bo'lsa, lekin ichida string bo'lsa
+    if (Array.isArray(obyektlar)) {
+      obyektlar = obyektlar.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    obyektlar = Array.from(new Set(obyektlar)); // Dublikatlarni olib tashlash
+
     let allowed = this.currentUser?.obyekt || 'Barchasi';
+    console.log('🔍 Debug - Allowed obyekt:', allowed, 'Type:', typeof allowed, 'IsArray:', Array.isArray(allowed));
+
+    // Allowed obyektni ham arrayga aylantirish
+    if (typeof allowed === 'string') {
+      if (allowed.includes(',')) {
+        allowed = allowed.split(',').map(o => o.trim());
+      } else {
+        allowed = [allowed];
+      }
+    }
+    if (Array.isArray(allowed)) {
+      allowed = allowed.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    allowed = Array.from(new Set(allowed));
+
     let isAdmin = this.getUserRole() === 'admin';
 
     // Qat'iy filtrlash: Agar admin bo'lmasa va maxsus obyekt berilgan bo'lsa
-    if (!isAdmin && allowed !== 'Barchasi') {
-      obyektlar = [allowed]; // faqat shu obyekt
+    if (!isAdmin && !allowed.includes('Barchasi')) {
+      obyektlar = obyektlar.filter(o => allowed.includes(o)); // faqat ruxsat etilgan obyektlar
     } else {
       // Agar "Barchasi" bo'lsa, barcha obyektlarni qoldiramiz
       // Lekin 'Barchasi' degan so'zning o'zini dublikat qilmaslik uchun tozalaymiz
@@ -246,7 +285,21 @@ const App = {
     });
 
     // trf-to hamma obektlarni o'z ichiga oladi
-    const allObyektlarArray = this.data.allObyektlar || obyektlar;
+    let allObyektlarArray = this.data.allObyektlar || obyektlar;
+    // allObyektlarni ham parse qilish
+    if (typeof allObyektlarArray === 'string') {
+      allObyektlarArray = allObyektlarArray.split(',').map(o => o.trim());
+    }
+    if (Array.isArray(allObyektlarArray)) {
+      allObyektlarArray = allObyektlarArray.flatMap(o => {
+        if (typeof o === 'string' && o.includes(',')) {
+          return o.split(',').map(x => x.trim());
+        }
+        return o;
+      });
+    }
+    allObyektlarArray = Array.from(new Set(allObyektlarArray));
+
     const trfToOpts = allObyektlarArray.filter(o=>o!=='Barchasi').map(o => `<option value="${o}">${o}</option>`).join('');
     const trfToEl = document.getElementById('trf-to');
     if (trfToEl) trfToEl.innerHTML = trfToOpts;
@@ -271,8 +324,16 @@ const App = {
   },
 
   hasAccess(minRole) {
-    const h = { free:0, pro:1, 'pro+':2, admin:3 };
+    const h = { free:0, pro:1, 'pro+':2, admin:3, owner:4 };
     return (h[this.getUserRole()]||0) >= (h[minRole]||0);
+  },
+
+  isOwner() {
+    return this.getUserRole() === 'owner';
+  },
+
+  isAdmin() {
+    return this.getUserRole() === 'admin' || this.getUserRole() === 'owner';
   },
 
   switchTab(name, btn) {

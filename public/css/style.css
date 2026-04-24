@@ -1661,6 +1661,7 @@ tr:last-child td {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 16px;
+    grid-auto-flow: row;
 }
 
 .user-card {
@@ -1669,6 +1670,7 @@ tr:last-child td {
     border-radius: var(--radius-lg);
     padding: 20px;
     transition: var(--transition);
+    break-inside: avoid;
 }
 
 .user-card:hover {
@@ -2008,7 +2010,8 @@ tr:last-child td {
     }
 
     .user-mgmt-card {
-        grid-template-columns: 1fr 1fr
+        grid-template-columns: 1fr 1fr;
+        grid-auto-flow: row
     }
 }
 
@@ -2034,7 +2037,8 @@ tr:last-child td {
     }
 
     .user-mgmt-card {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
+        grid-auto-flow: row
     }
 
     .page-content {
@@ -2084,6 +2088,57 @@ tr:last-child td {
 .autocomplete-item:hover {
     background-color: #6366f1 !important;
     color: #ffffff !important;
+}
+
+/* Resize Handle for Inventarizatsiya */
+.resize-handle {
+    width: 6px;
+    cursor: col-resize;
+    background: var(--border);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+    position: relative;
+    margin: 0 -3px;
+    z-index: 10;
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+    background: var(--accent);
+    width: 8px;
+    margin: 0 -4px;
+}
+
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3px;
+    height: 30px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    opacity: 0.5;
+}
+
+.resize-handle:hover::before,
+.resize-handle.active::before {
+    background: white;
+    opacity: 1;
+    width: 4px;
+    height: 35px;
+}
+
+.inventar-resize-container {
+    height: calc(100vh - 140px);
+    gap: 12px;
+}
+
+.inventar-left-panel,
+.inventar-right-panel {
+    transition: flex 0.05s ease;
 }
 
 
