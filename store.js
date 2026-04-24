@@ -5,11 +5,8 @@ const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'omborpro',
-  password: '0',
-  port: 5432
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 function uid(prefix = '') {
