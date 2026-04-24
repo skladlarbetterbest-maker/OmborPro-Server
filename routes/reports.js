@@ -10,7 +10,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
   const users = await store.getUsers();
   const userData = users[req.user.login] || {};
   const userObyekt = userData.obyekt || 'Barchasi';
-  const isAdmin = userData.role === 'admin';
+  const isAdmin = userData.role === 'admin' || userData.role === 'owner';
   
   let jurnal = await store.getJurnal();
   if (!isAdmin && userObyekt !== 'Barchasi') {
@@ -33,7 +33,7 @@ router.get('/qoldiq', authMiddleware, async (req, res) => {
   const users = await store.getUsers();
   const userData = users[req.user.login] || {};
   const userObyekt = userData.obyekt || 'Barchasi';
-  const isAdmin = userData.role === 'admin';
+  const isAdmin = userData.role === 'admin' || userData.role === 'owner';
   
   let jurnal = await store.getJurnal();
   if (!isAdmin && userObyekt !== 'Barchasi') {
@@ -49,14 +49,14 @@ router.get('/qoldiq', authMiddleware, async (req, res) => {
 });
 
 // GET /api/reports/filtered — filtrlangan hisobot (Pro)
-router.get('/filtered', authMiddleware, minRole('pro'), async (req, res) => {
+router.get('/filtered', authMiddleware, async (req, res) => {
   const { from, to, type, firma, product, user, obyekt } = req.query;
   let jurnal = await store.getJurnal();
 
   const users = await store.getUsers();
   const userData = users[req.user.login] || {};
   const userObyekt = userData.obyekt || 'Barchasi';
-  const isAdmin = userData.role === 'admin';
+  const isAdmin = userData.role === 'admin' || userData.role === 'owner';
   
   if (!isAdmin && userObyekt !== 'Barchasi') {
     jurnal = jurnal.filter(r => r.obyekt === userObyekt);
@@ -82,7 +82,7 @@ router.get('/low-stock', authMiddleware, async (req, res) => {
   const users = await store.getUsers();
   const userData = users[req.user.login] || {};
   const userObyekt = userData.obyekt || 'Barchasi';
-  const isAdmin = userData.role === 'admin';
+  const isAdmin = userData.role === 'admin' || userData.role === 'owner';
   
   let jurnal = await store.getJurnal();
   if (!isAdmin && userObyekt !== 'Barchasi') {
@@ -104,7 +104,7 @@ router.get('/low-stock', authMiddleware, async (req, res) => {
 });
 
 // GET /api/reports/debtor-summary — debitor/kreditor holati (Buxgalter)
-router.get('/debtor-summary', authMiddleware, minRole('pro'), async (req, res) => {
+router.get('/debtor-summary', authMiddleware, async (req, res) => {
   const debtors = await store.getDebtors();
   const creditors = await store.getCreditors();
   const payments = await store.getPayments();
