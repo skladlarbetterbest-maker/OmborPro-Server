@@ -1,0 +1,114 @@
+[
+  {
+    "id": "_A408110E",
+    "token": "eyJ1c2VyIjoiamFtb2xpZGRpbiIsIm9ieWVrdCI6ImFieWVrdCAyIiwiZXhwIjoxNzc2NDk0NTQ3MTQwfQ",
+    "obyekt": "abyekt 2",
+    "operator": "jamoliddin",
+    "status": "yakunlandi",
+    "sana": "17/04/2026",
+    "vaqt": "11:42:27",
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 333,
+        "haqiqiy": 332,
+        "farq": -1,
+        "narx": 12212,
+        "summa": 12212
+      }
+    ],
+    "yakunlanganVaqt": "11:42:37"
+  },
+  {
+    "id": "_647822E3",
+    "token": "eyJ1c2VyIjoiamFtb2xpZGRpbiIsIm9ieWVrdCI6IkFieWVrdCAxIiwiZXhwIjoxNzc2NDk0NjI5MDI3fQ",
+    "obyekt": "Abyekt 1",
+    "operator": "jamoliddin",
+    "status": "yakunlandi",
+    "sana": "17/04/2026",
+    "vaqt": "11:43:49",
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 48,
+        "haqiqiy": 43,
+        "farq": -5,
+        "narx": 30000,
+        "summa": 150000
+      }
+    ],
+    "yakunlanganVaqt": "11:44:11"
+  },
+  {
+    "id": "_6D5C82F7",
+    "token": "eyJ1c2VyIjoiamFtb2xpZGRpbiIsIm9ieWVrdCI6IkFieWVrdCAxIiwiZXhwIjoxNzc2NTEyMzI0OTM0fQ",
+    "obyekt": "Abyekt 1",
+    "operator": "jamoliddin",
+    "status": "bekor",
+    "sana": "17/04/2026",
+    "vaqt": "16:38:44",
+    "diffs": [],
+    "yakunlanganVaqt": "",
+    "bekorVaqt": "16:39:05"
+  },
+  {
+    "id": "_128F72E6",
+    "token": "eyJ1c2VyIjoiamFtb2xpZGRpbiIsIm9ieWVrdCI6IkFieWVrdCAxIiwiZXhwIjoxNzc2NTEyMzY3NDM5fQ",
+    "obyekt": "Abyekt 1",
+    "operator": "jamoliddin",
+    "status": "yakunlandi",
+    "sana": "17/04/2026",
+    "vaqt": "16:39:27",
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 43,
+        "haqiqiy": 42,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "yakunlanganVaqt": "16:39:38"
+  },
+  {
+    "id": "_458D508A",
+    "token": "eyJ1c2VyIjoiamFtb2xpZGRpbiIsIm9ieWVrdCI6IkFieWVrdCAxIiwiZXhwIjoxNzc2NTEyNDgwNzIwfQ",
+    "obyekt": "Abyekt 1",
+    "operator": "jamoliddin",
+    "status": "yakunlandi",
+    "sana": "17/04/2026",
+    "vaqt": "16:41:20",
+    "diffs": [
+      {
+        "mahsulot": "arra 12",
+        "tizimda": 42,
+        "haqiqiy": 41,
+        "farq": -1,
+        "narx": 30000,
+        "summa": 30000
+      }
+    ],
+    "yakunlanganVaqt": "16:41:31"
+  },
+  {
+    "id": "_ABAB3D9D",
+    "token": "eyJ1c2VyIjoiamFtb2xpZGRpbiIsIm9ieWVrdCI6ImFieWVrdCAyIiwiZXhwIjoxNzc2NTg0MTE2MTY4fQ",
+    "obyekt": "abyekt 2",
+    "operator": "jamoliddin",
+    "status": "yakunlandi",
+    "sana": "18/04/2026",
+    "vaqt": "12:35:16",
+    "diffs": [
+      {
+        "mahsulot": "Пчёлка диск 110",
+        "tizimda": 332,
+        "haqiqiy": 330,
+        "farq": -2,
+        "narx": 12212,
+        "summa": 24424
+      }
+    ],
+    "yakunlanganVaqt": "12:35:36"
+  }
+]

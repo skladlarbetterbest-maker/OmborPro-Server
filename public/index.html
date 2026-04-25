@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmborPro v3.8 — Boshqaruv Tizimi</title>
+    <meta name="description" content="OmborPro - Intellektual ombor boshqaruv tizimi. Pro va Pro+ tariflar.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <datalist id="firms-list"></datalist>
+
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="loader-logo" data-i18n="omborPro">OmborPro</div>
+        <div class="loader-sub">Pro+ v3.8 Tizim</div>
+        <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-page">
+        <div class="login-orb1"></div>
+        <div class="login-orb2"></div>
+        <div class="login-card">
+            <div class="login-brand">
+                <h1 data-i18n="omborPro">OmborPro</h1>
+                <p data-i18n="boshqaruvTizimi">Boshqaruv Tizimi</p>
+                <div class="login-tier-badge">v3.8 Pro+</div>
+            </div>
+            <div class="field-group">
+                <div class="field-label" data-i18n="foydalanuvchiNomi">Foydalanuvchi nomi</div>
+                <input class="field-input" id="login-user" type="text" autocomplete="off" placeholder="login kiriting">
+            </div>
+            <div class="field-group">
+                <div class="field-label" data-i18n="parol">Parol</div>
+                <input class="field-input" id="login-pass" type="password" placeholder="••••••">
+            </div>
+            <button class="login-btn" onclick="App.doLogin()" data-i18n="tizimgaKirish">TIZIMGA KIRISH</button>
+            <div class="login-error" id="login-error"></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard-page" style="display:none">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <h2 data-i18n="omborPro">OmborPro</h2>
+                <div class="version">Pro+ v3.8</div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Asosiy</div>
+                <button class="nav-item active" onclick="App.switchTab('dashboard', this)" id="nav-dashboard">
+                    <span class="nav-icon">📊</span> <span data-i18n="dashboard">Dashboard</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('kirim', this)" id="nav-kirim">
+                    <span class="nav-icon">📦</span> <span data-i18n="kirimChiqim">Kirim / Chiqim</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('qoldiq', this)" id="nav-qoldiq">
+                    <span class="nav-icon">📋</span> <span data-i18n="qoldiq">Qoldiq</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('jurnal', this)" id="nav-jurnal">
+                    <span class="nav-icon">📜</span> <span data-i18n="jurnal">Jurnal</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('minqoldiq', this)" id="nav-minqoldiq">
+                    <span class="nav-icon">📉</span> <span data-i18n="minQoldiq">Min Qoldiq</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:8px">Skladchi</div>
+                <button class="nav-item" onclick="App.switchTab('transfer', this)" id="nav-transfer">
+                    <span class="nav-icon">🔄</span> <span data-i18n="transfer">Transfer</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('inventar', this)" id="nav-inventar">
+                    <span class="nav-icon">📦</span> <span data-i18n="inventarizatsiya">Inventarizatsiya</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:8px">Analitika</div>
+                <button class="nav-item" onclick="App.switchTab('hisobot', this)" id="nav-hisobot">
+                    <span class="nav-icon">📈</span> <span data-i18n="hisobotlar">Hisobotlar</span>
+                    <span class="nav-badge pro">PRO</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('charts', this)" id="nav-charts">
+                    <span class="nav-icon">🎯</span> <span data-i18n="chartlar">Chartlar</span>
+                    <span class="nav-badge proplus">PRO+</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:8px">Buxgalteriya</div>
+                <button class="nav-item" onclick="App.switchTab('moliya', this)" id="nav-moliya">
+                    <span class="nav-icon">💰</span> <span data-i18n="moliya">Moliya</span>
+                    <span class="nav-badge proplus">PRO+</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:8px">Boshqaruv</div>
+                <button class="nav-item" onclick="App.switchTab('tarix', this)" id="nav-tarix" style="display:none">
+                    <span class="nav-icon">🗂️</span> <span data-i18n="tarix">Tarix</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('admin', this)" id="nav-admin" style="display:none">
+                    <span class="nav-icon">👑</span> <span data-i18n="adminPanel">Admin Panel</span>
+                </button>
+                <button class="nav-item" onclick="App.switchTab('settings', this)" id="nav-settings">
+                    <span class="nav-icon">⚙️</span> <span data-i18n="sozlamalar">Sozlamalar</span>
+                </button>
+            </div>
+
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebar-avatar">JA</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebar-username">—</div>
+                    <div class="sidebar-user-role role-free" id="sidebar-role">FREE</div>
+                </div>
+                <button class="sidebar-logout" onclick="App.doLogout()" title="Chiqish">✕</button>
+            </div>
+        </nav>
+
+        <!-- MAIN -->
+        <div class="main-content">
+            <header class="top-header">
+                <h1 class="header-title" id="header-title">Dashboard</h1>
+                <div class="header-right">
+                    <div class="header-date" id="current-date">—</div>
+                    <div class="header-premium-badge badge-free" id="header-tier-badge">FREE</div>
+                </div>
+            </header>
+
+            <div class="page-content">
+
+                <!-- ===== DASHBOARD TAB ===== -->
+                <div class="tab-panel active" id="tab-dashboard">
+                    <div class="stats-grid" id="stats-grid">
+                        <div class="stat-card accent">
+                            <div class="stat-icon">📥</div>
+                            <div class="stat-label" data-i18n="jamiKirim">Jami Kirim</div>
+                            <div class="stat-value" id="stat-kirim">0</div>
+                            <div class="stat-change up" id="stat-kirim-change">↑ 0%</div>
+                        </div>
+                        <div class="stat-card red-card">
+                            <div class="stat-icon">📤</div>
+                            <div class="stat-label" data-i18n="jamiChiqim">Jami Chiqim</div>
+                            <div class="stat-value" id="stat-chiqim">0</div>
+                            <div class="stat-change down" id="stat-chiqim-change">↓ 0%</div>
+                        </div>
+                        <div class="stat-card green-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-label" data-i18n="hozirgiQoldiq">Hozirgi Qoldiq</div>
+                            <div class="stat-value" id="stat-qoldiq">0</div>
+                        </div>
+                        <div class="stat-card orange-card">
+                            <div class="stat-icon">📦</div>
+                            <div class="stat-label" data-i18n="mahsulotlarSon">Mahsulotlar</div>
+                            <div class="stat-value" id="stat-products">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Low stock warning -->
+                    <div class="card mb-24" id="low-stock-card" style="display:none; border-left:4px solid var(--orange)">
+                        <div class="card-header">
+                            <div><div class="card-title">⚠️ <span data-i18n="kamQolgan">Kam Qolgan Mahsulotlar</span></div></div>
+                        </div>
+                        <div id="low-stock-list"></div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" data-i18n="kirimChiqimTrend">Kirim / Chiqim Trendi</div>
+                                    <div class="card-subtitle" data-i18n="oxirgi7kun">Oxirgi 7 kun</div>
+                                </div>
+                                <div class="period-selector" id="trend-period">
+                                    <button class="period-btn active" onclick="Charts.setTrendPeriod(7, this)">7 kun</button>
+                                    <button class="period-btn" onclick="Charts.setTrendPeriod(14, this)">14 kun</button>
+                                    <button class="period-btn" onclick="Charts.setTrendPeriod(30, this)">30 kun</button>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" data-i18n="mahsulotTaqsimot">Mahsulot Taqsimoti</div>
+                                    <div class="card-subtitle" data-i18n="qoldiqBoyicha">Qoldiq bo'yicha</div>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="distributionChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" data-i18n="oxirgiAmallar">Oxirgi Amallar</div>
+                                    <div class="card-subtitle" id="dash-jurnal-count">0 yozuv</div>
+                                </div>
+                                <button class="btn btn-outline btn-sm" onclick="App.loadData()" data-i18n="yangilashBtn">↻ Yangilash</button>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead><tr><th data-i18n="sana">Sana</th><th data-i18n="tur">Tur</th><th data-i18n="mahsulot">Mahsulot</th><th data-i18n="miqdor">Miqdor</th><th data-i18n="summa">Summa</th></tr></thead>
+                                    <tbody id="last-rows">
+                                        <tr><td colspan="5" class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text" data-i18n="malumotYuklanmoqda">Ma'lumot yuklanmoqda...</div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title" data-i18n="faoliyat">Faoliyat</div>
+                                    <div class="card-subtitle" data-i18n="oxirgiHarakatlar">Oxirgi harakatlar</div>
+                                </div>
+                            </div>
+                            <div class="timeline" id="activity-timeline">
+                                <div class="empty-state"><div class="empty-state-text" data-i18n="haliFaoliyatYoq">Xali faoliyat yo'q</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== KIRIM/CHIQIM TAB ===== -->
+                <div class="tab-panel" id="tab-kirim">
+                    <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 24px;">
+                        <div>
+                            <div class="flex-between mb-16" style="background:var(--bg-card); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border);">
+                                <h2 id="kc-title" style="margin:0; font-size:18px;">📥 <span data-i18n="kirim">Kirim</span> (<span data-i18n="kirimCap">Prixod</span>)</h2>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn btn-sm btn-green" id="btn-toggle-kirim" onclick="KirimChiqim.switchKC('kirim')" data-i18n="kirimCap">KIRIM</button>
+                                    <button class="btn btn-sm btn-outline" id="btn-toggle-chiqim" onclick="KirimChiqim.switchKC('chiqim')" data-i18n="chiqimCap">CHIQIM</button>
+                                </div>
+                            </div>
+
+                            <!-- KIRIM FORM -->
+                            <div class="form-card kirim-form" id="kc-form-kirim">
+                                <div style="display:flex;gap:16px;align-items:flex-end;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+                                    <div style="flex:1">
+                                        <div class="f-label">Sana</div>
+                                        <input class="f-input" id="k-sana" value="" placeholder="DD.MM.YYYY" style="margin-bottom:0">
+                                    </div>
+                                </div>
+                                <div class="f-label" data-i18n="qaysiFirmadan">1. Qaysi firmadan (Yetkazib beruvchi)</div>
+                                <div style="display:flex;gap:8px">
+                                    <input class="f-input" id="k-yetkazuvchi" placeholder="Kompaniya nomi" list="firms-list" style="margin-bottom:0;flex:1">
+                                    <button class="btn btn-outline owner-only" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="document.getElementById('kirim-new-firm-form').style.display='block'">➕</button>
+                                </div>
+                                <div id="kirim-new-firm-form" style="display:none; background:rgba(30,41,59,0.5); padding:16px; border-radius:8px; margin-top:8px; border:1px solid var(--border)">
+                                    <div style="font-size:12px; font-weight:bold; margin-bottom:12px; color:var(--accent-light)">Yangi firma qo'shish</div>
+                                    <input class="f-input" id="knf-nom" placeholder="Firma nomi" style="margin-bottom:8px">
+                                    <input class="f-input" id="knf-inn" placeholder="INN" style="margin-bottom:8px">
+                                    <input class="f-input" id="knf-telegram" placeholder="Telegram ID" style="margin-bottom:8px">
+                                    <input class="f-input" id="knf-phone" placeholder="Telefon (+998...)" style="margin-bottom:8px">
+                                    <input class="f-input" id="knf-address" placeholder="Manzil" style="margin-bottom:12px">
+                                    <div style="display:flex;gap:8px;justify-content:flex-end">
+                                        <button class="btn btn-sm btn-outline" onclick="document.getElementById('kirim-new-firm-form').style.display='none'">Bekor qilish</button>
+                                        <button class="btn btn-sm btn-primary" onclick="KirimChiqim.saveNewFirm()">Saqlash</button>
+                                    </div>
+                                </div>
+
+                                <div class="f-label mt-16" data-i18n="qaysiObyektga">Qaysi Obyektga kirim qilinmoqda</div>
+                                <select class="f-select" id="k-obyekt" onchange="KirimChiqim.renderSideQoldiq()"></select>
+
+                                <div class="f-label mt-16" style="margin-bottom:12px;" data-i18n="mahsulotlarSon">2. Mahsulotlar</div>
+                                <div id="kirim-rows"></div>
+                                <button class="btn btn-outline btn-sm mb-16" onclick="KirimChiqim.addRow('kirim')">+ <span data-i18n="yangiQator">Mahsulot qatorini qo'shish</span></button>
+
+                                <div class="f-label" data-i18n="izoh">Izoh</div>
+                                <input class="f-input" id="k-izoh" placeholder="Ixtiyoriy..." data-i18n="ixtiyoriy">
+
+                                <div class="total-summary"><span data-i18n="jami">Jami</span>: <span id="k-jami-summa" style="color:var(--green)">0</span> <span data-i18n="narxSum">so'm</span></div>
+                                <button class="btn btn-green btn-full" onclick="KirimChiqim.submitKirim()" data-i18n="kirimQoshish">KIRIM QO'SHISH</button>
+                                <div class="success-msg" id="k-msg"></div>
+                            </div>
+
+                            <!-- CHIQIM FORM -->
+                            <div class="form-card chiqim-form" id="kc-form-chiqim" style="display:none">
+                                <div style="display:flex;gap:16px;align-items:flex-end;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+                                    <div style="flex:1">
+                                        <div class="f-label" data-i18n="sana">Sana</div>
+                                        <input class="f-input" id="c-sana" value="" placeholder="DD.MM.YYYY" style="margin-bottom:0">
+                                    </div>
+                                </div>
+                                <div class="f-label" data-i18n="qaysiObyektdan">1. Qaysi Obyektdan Chiqim qilinmoqda</div>
+                                <select class="f-select" id="c-oluvchi" onchange="KirimChiqim.renderSideQoldiq()"></select>
+
+                                <div class="f-label mt-16" style="margin-bottom:12px;" data-i18n="mahsulotlarSon">2. Mahsulotlar</div>
+                                <div id="chiqim-rows"></div>
+                                <button class="btn btn-outline btn-sm mb-16" onclick="KirimChiqim.addRow('chiqim')">+ <span data-i18n="yangiQator">Mahsulot qatorini qo'shish</span></button>
+
+                                <div class="f-label" data-i18n="izoh">Izoh</div>
+                                <input class="f-input" id="c-izoh" placeholder="Ixtiyoriy..." data-i18n="ixtiyoriy">
+
+                                <div class="total-summary"><span data-i18n="jami">Jami</span>: <span id="c-jami-summa" style="color:var(--red)">0</span> <span data-i18n="narxSum">so'm</span></div>
+                                <button class="btn btn-red btn-full" onclick="KirimChiqim.submitChiqim()" data-i18n="chiqimQoshish">CHIQIM QO'SHISH</button>
+                                <div class="success-msg" id="c-msg"></div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT SIDE - QOLDIQ -->
+                        <div>
+                            <div class="card" style="height:calc(100vh - 120px); overflow-y:auto; padding:16px;">
+                                <div class="card-title" style="font-size:14px; position:sticky; top:-16px; background:var(--bg-card); z-index:10; padding:16px 0 8px 0; border-bottom:1px solid var(--border); margin-top:-16px; margin-bottom:12px;">
+                                    📦 <span data-i18n="omborQoldiq">Ombor qoldig'i</span><br>
+                                    <span style="font-size:10px; color:var(--text-secondary); font-weight:normal" data-i18n="omborQoldiqHint">2 marta bosing - Formaga qo'shiladi</span>
+                                </div>
+                                <div style="margin-bottom:12px;">
+                                    <input class="f-input" id="qoldiq-search" placeholder="Qidirish..." data-i18n="qidirish" oninput="KirimChiqim.renderSideQoldiq()" style="margin-bottom:8px; font-size:12px;">
+                                    <div style="display:flex; gap:4px;">
+                                        <button class="btn btn-sm btn-outline" onclick="KirimChiqim.sortSide('name')" id="sort-qoldiq-name">A-Z</button>
+                                        <button class="btn btn-sm btn-outline" onclick="KirimChiqim.sortSide('qoldiq')" id="sort-qoldiq-qoldiq" data-i18n="qoldiq">Qoldiq</button>
+                                    </div>
+                                </div>
+                                <div id="side-qoldiq-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== QOLDIQ TAB ===== -->
+                <div class="tab-panel" id="tab-qoldiq">
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title" data-i18n="mahsulotQoldiqlari">Mahsulot Qoldiqlari</div>
+                                <div class="card-subtitle" id="qoldiq-count">0 mahsulot</div>
+                            </div>
+                            <div style="display:flex;gap:12px;align-items:center">
+                                <div class="f-label" style="margin:0" data-i18n="obyektFiltrlash">Obyekt:</div>
+                                <select class="f-select" id="qoldiq-obyekt-filter" onchange="Qoldiq.render()" style="margin-bottom:0;min-width:160px">
+                                    <option value="Barchasi" data-i18n="barchasi">Barchasi</option>
+                                </select>
+                                <button class="btn btn-outline btn-sm" onclick="Qoldiq.exportXLS()">📥 XLS</button>
+                                <button class="btn btn-outline btn-sm" onclick="Qoldiq.print()">🖨️ Chop etish</button>
+                                <button class="btn btn-outline btn-sm" onclick="App.loadData()" data-i18n="yangilashBtn">↻ Yangilash</button>
+                            </div>
+                        </div>
+                        <div class="quick-summary" style="margin-bottom:20px;">
+                            <div class="quick-item" style="flex:1;">
+                                <div class="quick-item-val" style="color:var(--orange);font-size:28px" id="qoldiq-total-summa">0 so'm</div>
+                                <div class="quick-item-label" data-i18n="jamiSumma">Jami Summa</div>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="data-table qoldiq-table">
+                                <thead>
+                                    <tr class="qoldiq-header-row">
+                                        <th onclick="Qoldiq.sort('index')" style="cursor:pointer">#</th>
+                                        <th onclick="Qoldiq.sort('mahsulot')" style="cursor:pointer" data-i18n="mahsulot">Mahsulot</th>
+                                        <th onclick="Qoldiq.sort('obyekt')" style="cursor:pointer" data-i18n="obyekt">Obyekt</th>
+                                        <th onclick="Qoldiq.sort('kirim')" style="cursor:pointer" data-i18n="kirimText">📥 Kirim</th>
+                                        <th onclick="Qoldiq.sort('chiqim')" style="cursor:pointer" data-i18n="chiqimText">📤 Chiqim</th>
+                                        <th onclick="Qoldiq.sort('qoldiq')" style="cursor:pointer" data-i18n="omborQoldiqText">📦 Qoldiq</th>
+                                        <th onclick="Qoldiq.sort('summa')" style="cursor:pointer" data-i18n="summa">💰 Summa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="qoldiq-rows"><tr><td colspan="7" class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text" data-i18n="yuklanmoqda">Yuklanmoqda...</div></td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== JURNAL TAB ===== -->
+                <div class="tab-panel" id="tab-jurnal">
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title" data-i18n="toliqJurnal">To'liq Jurnal</div>
+                                <div class="card-subtitle" id="jurnal-count2">0 yozuv</div>
+                            </div>
+                            <div style="display:flex;gap:8px">
+                                <input class="f-input" id="jurnal-search" placeholder="Qidirish..." data-i18n="qidirish" oninput="Jurnal.render()" style="margin-bottom:0;width:180px;font-size:12px">
+                                <select class="f-select" id="jurnal-obyekt-filter" onchange="Jurnal.render()" style="margin-bottom:0;min-width:140px"><option value="Barchasi" data-i18n="barchasi">Barchasi</option></select>
+                                <select class="f-select" id="jurnal-type-filter" onchange="Jurnal.render()" style="margin-bottom:0;min-width:120px">
+                                    <option value="Barchasi" data-i18n="barchasi">Barchasi</option>
+                                    <option value="Kirim" data-i18n="faqatKirim">Faqat Kirim</option>
+                                    <option value="Chiqim" data-i18n="faqatChiqim">Faqat Chiqim</option>
+                                </select>
+                                <button class="btn btn-outline btn-sm" onclick="App.loadData()" data-i18n="yangilash">↻ Yangilash</button>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th>#</th><th>Sana</th><th>Tur</th><th>Obyekt</th><th>Mahsulot</th><th>Miqdor</th><th>Narx</th><th>Summa</th><th>Firma</th><th>Amallar</th>
+                                </tr></thead>
+                                <tbody id="jurnal-rows"><tr><td colspan="10" class="empty-state"><div class="empty-state-icon">📜</div><div class="empty-state-text">Yuklanmoqda...</div></td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== TARIX TAB ===== -->
+                <div class="tab-panel" id="tab-tarix">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title" data-i18n="ochirilganYozuvlar">🗂️ O'chirilgan yozuvlar tarixi</div>
+                                <div class="card-subtitle" id="archive-count">0 yozuv</div>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="Jurnal.clearArchive()">🗑️ Hammasini tozalash</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Sana</th><th>Tur</th><th>Obyekt</th><th>Mahsulot</th><th>Miqdor</th><th>Summa</th><th>Holat</th><th>Amal</th></tr></thead>
+                                <tbody id="archive-rows"><tr><td colspan="8" class="empty-state"><div class="empty-state-text">O'chirilgan yozuvlar yo'q</div></td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== TRANSFER TAB (Skladchi) ===== -->
+                <div class="tab-panel" id="tab-transfer">
+                    <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 24px;">
+                        <div>
+                            <div class="card mb-24">
+                                <div class="card-header">
+                                    <div>
+                                        <div class="card-title">🔄 Ombor Transferi</div>
+                                        <div class="card-subtitle">Bir obyektdan boshqasiga mahsulot ko'chirish</div>
+                                    </div>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+                                    <div>
+                                        <div class="f-label">Qayerdan</div>
+                                        <select class="f-select" id="trf-from" onchange="Warehouse.renderTransferQoldiq()"></select>
+                                    </div>
+                                    <div>
+                                        <div class="f-label">Qayerga</div>
+                                        <select class="f-select" id="trf-to"></select>
+                                    </div>
+                                </div>
+                                <div class="f-label">Mahsulot</div>
+                                <div style="position:relative">
+                                    <input class="f-input" id="trf-product" placeholder="Qidirish... (Yoki yon tomondan tanlang)" autocomplete="off" oninput="KirimChiqim.filterProducts(this,'trf')" onfocus="KirimChiqim.filterProducts(this,'trf')" onblur="setTimeout(()=>KirimChiqim.hideDropdown('trf'),200)">
+                                    <div class="autocomplete-dropdown" id="dropdown-trf"></div>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                            <div><div class="f-label">Miqdor</div><input class="f-input" id="trf-qty" placeholder="0" type="text" inputmode="decimal" oninput="App.onNumberInput(this)"></div>
+                            <div><div class="f-label">Izoh</div><input class="f-input" id="trf-note" placeholder="Ixtiyoriy..."></div>
+                        </div>
+                        <button class="btn btn-primary btn-full mt-16" onclick="Warehouse.doTransfer()">TRANSFER QILISH</button>
+                        <div class="success-msg" id="trf-msg"></div>
+                    </div>
+                            <div class="card">
+                                <div class="card-header"><div><div class="card-title">Transfer Tarixi</div></div></div>
+                                <div class="table-wrap">
+                                    <table>
+                                        <thead><tr><th>Sana</th><th>Qayerdan</th><th>Qayerga</th><th>Mahsulot</th><th>Miqdor</th><th>Operator</th></tr></thead>
+                                        <tbody id="transfer-rows"><tr><td colspan="6" class="empty-state"><div class="empty-state-text">Transfer tarixi bo'sh</div></td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- RIGHT SIDE - QOLDIQ FOR TRANSFER -->
+                        <div>
+                            <div class="card" style="height:calc(100vh - 120px); overflow-y:auto; padding:16px;">
+                                <div class="card-title" style="font-size:14px; position:sticky; top:-16px; background:var(--bg-card); z-index:10; padding:16px 0 8px 0; border-bottom:1px solid var(--border); margin-top:-16px; margin-bottom:12px;">
+                                    📦 Ombor qoldig'i (Qayerdan)<br>
+                                    <span style="font-size:10px; color:var(--text-secondary); font-weight:normal">2 marta bosing - Formaga qo'shiladi</span>
+                                </div>
+                                <div style="margin-bottom:12px;">
+                                    <input class="f-input" id="trf-qoldiq-search" placeholder="Qidirish..." oninput="Warehouse.renderTransferQoldiq()" style="margin-bottom:8px; font-size:12px;">
+                                    <div style="display:flex; gap:4px;">
+                                        <button class="btn btn-sm btn-outline" onclick="Warehouse.sortTransferSide('name')">A-Z</button>
+                                        <button class="btn btn-sm btn-outline" onclick="Warehouse.sortTransferSide('qoldiq')">Qoldiq</button>
+                                    </div>
+                                </div>
+                                <div id="trf-side-qoldiq-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== INVENTARIZATSIYA TAB ===== -->
+                <div class="tab-panel" id="tab-inventar">
+                    <div class="inventar-resize-container" style="display:flex; gap:12px; align-items:stretch;">
+
+                        <!-- LEFT: Inventar Form -->
+                        <div class="inventar-left-panel" style="flex:1.4; min-width:300px;">
+                            <div class="card mb-24" style="height:100%; display:flex; flex-direction:column;">
+                                <div class="card-header">
+                                    <div>
+                                        <div class="card-title">📦 Inventarizatsiya</div>
+                                        <div class="card-subtitle">Haqiqiy qoldiqni tizim bilan solishtirish</div>
+                                    </div>
+                                    <div style="display:flex;gap:8px;align-items:center;">
+                                        <select class="f-select" id="inv-obyekt" onchange="Warehouse.loadInventarItems()" style="margin-bottom:0;min-width:150px"></select>
+                                    </div>
+                                </div>
+
+                                <!-- Search bar -->
+                                <div style="margin-bottom:16px;">
+                                    <input class="f-input" id="inv-search" placeholder="🔍 Mahsulot qidirish..." oninput="Warehouse.filterInventarItems()" style="margin-bottom:0;">
+                                </div>
+
+                                <!-- Items list -->
+                                <div id="inventar-items" style="flex:1; overflow-y:auto; margin:0 -4px; padding:0 4px;"></div>
+
+                                <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:flex; gap:8px;">
+                                    <button class="btn btn-primary" style="flex:1" onclick="Warehouse.submitInventar()">✅ SAQLASH</button>
+                                </div>
+                                <div class="success-msg" id="inv-msg"></div>
+                            </div>
+                        </div>
+
+                        <!-- RESIZE HANDLE -->
+                        <div class="resize-handle" id="inventar-resize-handle"></div>
+
+                        <!-- RIGHT: Links + History -->
+                        <div class="inventar-right-panel" style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:0;">
+                            <!-- Mobile Link Card -->
+                            <div class="card inv-top-card" style="flex:1; display:flex; flex-direction:column; min-height:100px; margin-bottom:6px;">
+                                <div class="card-header">
+                                    <div>
+                                        <div class="card-title">📱 Telefon Linki</div>
+                                        <div class="card-subtitle">Buxgalter telefon orqali inventar qiladi</div>
+                                    </div>
+                                    <button class="btn btn-sm btn-primary" onclick="Warehouse.createMobileLink()">+ Yaratish</button>
+                                </div>
+
+                                <div id="inv-mobile-link-section" style="display:none;">
+                                    <div style="background:var(--bg-secondary);border-radius:8px;padding:12px;margin-bottom:12px;">
+                                        <div class="f-label" style="margin-bottom:6px;">Havola:</div>
+                                        <div style="display:flex;gap:6px;">
+                                            <input class="f-input" id="inv-mobile-link" readonly style="flex:1;font-size:11px;font-family:monospace;margin-bottom:0;">
+                                            <button class="btn btn-sm btn-outline" onclick="Warehouse.copyMobileLink()" title="Nusxalash">📋</button>
+                                        </div>
+                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                                            <div id="inv-link-status" style="font-size:11px;color:var(--accent);">⚠️ 24 soat amal qiladi</div>
+                                            <div style="display:flex;gap:6px;">
+                                                <button class="btn btn-sm btn-outline" onclick="Warehouse.refreshLinksStatus()">🔄</button>
+                                                <button class="btn btn-sm btn-outline" onclick="Warehouse.cancelLink()" style="color:var(--red);">❌</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Links Table -->
+                                <div class="table-wrap" style="flex:1; overflow-y:auto; min-height:0;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Sana</th>
+                                                <th>Obyekt</th>
+                                                <th>Status</th>
+                                                <th>Farq</th>
+                                                <th>Amal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inv-links-rows">
+                                            <tr><td colspan="5" class="empty-state"><div class="empty-state-text">Linklar yo'q</div></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="resize-handle-h" id="inv-right-resize-handle"></div>
+
+                            <!-- History Card -->
+                            <div class="card inv-bottom-card" style="flex:1; display:flex; flex-direction:column; min-height:100px; margin-top:6px;">
+                                <div class="card-header">
+                                    <div>
+                                        <div class="card-title">🗂️ Inventarizatsiya Tarixi</div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline" onclick="Warehouse.toggleHistory()" id="inv-history-toggle-btn">▼ Yashirish</button>
+                                </div>
+                                <div id="inv-history-section" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+                                    <div class="table-wrap" style="flex:1; overflow-y:auto; min-height:0;">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Sana</th>
+                                                    <th>Obyekt</th>
+                                                    <th>Farqlar</th>
+                                                    <th>Summa</th>
+                                                    <th>Amal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="inventar-rows">
+                                                <tr><td colspan="6" class="empty-state"><div class="empty-state-text">Inventarizatsiya tarixi bo'sh</div></td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===== HISOBOT TAB (PRO) ===== -->
+                <div class="tab-panel" id="tab-hisobot">
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">📈 Hisobotlar</div>
+                                <div class="card-subtitle">Sana bo'yicha filtrlash va eksport</div>
+                            </div>
+                        </div>
+                        <div class="report-filters">
+                            <div><div class="f-label">Boshlanish</div><input type="date" class="filter-input" id="report-from"></div>
+                            <div><div class="f-label">Tugash</div><input type="date" class="filter-input" id="report-to"></div>
+                            <div><div class="f-label">Turi</div><select class="filter-input" id="report-type"><option value="all">Barchasi</option><option value="Kirim">Kirim</option><option value="Chiqim">Chiqim</option></select></div>
+                            <div><div class="f-label">Obyekt</div><select class="filter-input" id="report-obyekt"></select></div>
+                            <div><div class="f-label">Firma</div><input class="filter-input" id="report-firma" placeholder="Firma..." list="firms-list"></div>
+                            <div style="align-self:flex-end"><button class="btn btn-primary btn-sm" onclick="Reports.generate()">HISOBOT YARATISH</button></div>
+                        </div>
+                        <div id="report-summary" style="display:none">
+                            <div class="divider"></div>
+                            <div class="quick-summary" id="report-summary-cards"></div>
+                            <div class="divider"></div>
+                            <div class="flex-between mb-16">
+                                <div class="card-title">Natijalar</div>
+                                <div class="export-group">
+                                    <button class="btn btn-outline btn-sm" onclick="Reports.export('csv')">📄 CSV</button>
+                                    <button class="btn btn-outline btn-sm" onclick="Reports.export('print')">🖨️ Chop</button>
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead><tr><th>#</th><th>Sana</th><th>Tur</th><th>Mahsulot</th><th>Miqdor</th><th>Summa</th><th>Tomon</th><th>Obyekt</th></tr></thead>
+                                    <tbody id="report-rows"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== CHARTS TAB (PRO+) ===== -->
+                <div class="tab-panel" id="tab-charts">
+                    <div class="charts-grid mb-24">
+                        <div class="card">
+                            <div class="card-header"><div><div class="card-title">🎯 Status Hisoboti</div></div></div>
+                            <div class="chart-container"><canvas id="statusChart"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><div><div class="card-title">📊 Top Mahsulotlar</div></div></div>
+                            <div class="chart-container"><canvas id="topProductsChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="charts-grid mb-24">
+                        <div class="card">
+                            <div class="card-header"><div><div class="card-title">📅 Oylik Tahlil</div></div></div>
+                            <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><div><div class="card-title">💹 Summa Trendi</div></div></div>
+                            <div class="chart-container"><canvas id="cashFlowChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="card mb-24">
+                        <div class="card-header"><div><div class="card-title">🤖 AI Tahlil va Prognoz</div></div></div>
+                        <div id="ai-analysis-text" style="padding:16px; background:rgba(31,41,55,0.4); border-left:4px solid #8b5cf6; border-radius:var(--radius-sm); margin-bottom:24px; color:var(--text-secondary); line-height:1.6;">Ma'lumotlar tahlil qilinmoqda...</div>
+                        <div class="chart-container" style="height:250px"><canvas id="predictionChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- ===== MOLIYA TAB (Buxgalter) ===== -->
+                <div class="tab-panel" id="tab-moliya">
+                    <div class="stats-grid mb-24">
+                        <div class="stat-card green-card">
+                            <div class="stat-icon">📥</div>
+                            <div class="stat-label">Debitorlar (bizga to'lashi kerak)</div>
+                            <div class="stat-value" id="mol-debtors">0</div>
+                        </div>
+                        <div class="stat-card red-card">
+                            <div class="stat-icon">📤</div>
+                            <div class="stat-label">Kreditorlar (biz to'lashimiz kerak)</div>
+                            <div class="stat-value" id="mol-creditors">0</div>
+                        </div>
+                        <div class="stat-card accent">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-label">Balans</div>
+                            <div class="stat-value" id="mol-balance">0</div>
+                        </div>
+                        <div class="stat-card orange-card">
+                            <div class="stat-icon">💳</div>
+                            <div class="stat-label">To'lovlar</div>
+                            <div class="stat-value" id="mol-payments">0</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid mb-24">
+                        <!-- Debitor qo'shish -->
+                        <div class="card">
+                            <div class="card-header"><div><div class="card-title">📥 Debitor qo'shish</div><div class="card-subtitle">Bizga qarzdor bo'lganlar</div></div></div>
+                            <div class="f-label">Firma</div>
+                            <div style="display:flex;gap:8px;margin-bottom:12px">
+                                <input class="f-input" id="dbt-firma" placeholder="Firma nomi" list="firms-list" style="margin-bottom:0;flex:1">
+                                <button class="btn btn-outline" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="App.promptNewFirm('dbt-firma')">➕</button>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div><div class="f-label">Summa</div><input class="f-input" id="dbt-summa" placeholder="0" type="text" inputmode="decimal" oninput="App.onNumberInput(this)"></div>
+                                <div><div class="f-label">Muddati</div><input class="f-input" id="dbt-muddati" type="date"></div>
+                            </div>
+                            <div class="f-label">Izoh</div><input class="f-input" id="dbt-izoh" placeholder="Ixtiyoriy...">
+                            <button class="btn btn-green btn-full" onclick="Moliya.addDebtor()">DEBITOR QO'SHISH</button>
+                            <div class="success-msg" id="dbt-msg"></div>
+                        </div>
+                        <!-- Kreditor qo'shish -->
+                        <div class="card">
+                            <div class="card-header"><div><div class="card-title">📤 Kreditor qo'shish</div><div class="card-subtitle">Biz qarzdor bo'lganmiz</div></div></div>
+                            <div class="f-label">Firma</div>
+                            <div style="display:flex;gap:8px;margin-bottom:12px">
+                                <input class="f-input" id="crd-firma" placeholder="Firma nomi" list="firms-list" style="margin-bottom:0;flex:1">
+                                <button class="btn btn-outline" style="padding:0 12px; flex-shrink:0" title="Yangi firma qo'shish" onclick="App.promptNewFirm('crd-firma')">➕</button>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div><div class="f-label">Summa</div><input class="f-input" id="crd-summa" placeholder="0" type="text" inputmode="decimal" oninput="App.onNumberInput(this)"></div>
+                                <div><div class="f-label">Muddati</div><input class="f-input" id="crd-muddati" type="date"></div>
+                            </div>
+                            <div class="f-label">Izoh</div><input class="f-input" id="crd-izoh" placeholder="Ixtiyoriy...">
+                            <button class="btn btn-red btn-full" onclick="Moliya.addCreditor()">KREDITOR QO'SHISH</button>
+                            <div class="success-msg" id="crd-msg"></div>
+                        </div>
+                    </div>
+
+                    <!-- Debitorlar jadvali -->
+                    <div class="card mb-24">
+                        <div class="card-header"><div><div class="card-title">📋 Debitorlar ro'yxati</div></div></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Firma</th><th>Summa</th><th>To'langan</th><th>Qoldiq</th><th>Sana</th><th>Muddat</th><th>Amal</th></tr></thead>
+                                <tbody id="debtors-rows"><tr><td colspan="7" class="empty-state"><div class="empty-state-text">Debitorlar yo'q</div></td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Kreditorlar jadvali -->
+                    <div class="card mb-24">
+                        <div class="card-header"><div><div class="card-title">📋 Kreditorlar ro'yxati</div></div></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Firma</th><th>Summa</th><th>To'langan</th><th>Qoldiq</th><th>Sana</th><th>Muddat</th><th>Amal</th></tr></thead>
+                                <tbody id="creditors-rows"><tr><td colspan="7" class="empty-state"><div class="empty-state-text">Kreditorlar yo'q</div></td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ADMIN TAB ===== -->
+                <div class="tab-panel" id="tab-admin">
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <div><div class="card-title">👑 Admin Panel</div><div class="card-subtitle">Foydalanuvchilarni boshqarish</div></div>
+                            <div style="display:flex;gap:8px">
+                                <button class="btn btn-primary btn-sm" onclick="Admin.showAddUser()">+ Yangi Foydalanuvchi</button>
+                                <button class="btn btn-green btn-sm" onclick="Admin.saveAllChanges()">💾 Barchasini Saqlash</button>
+                            </div>
+                        </div>
+                        <div class="user-mgmt-card" id="admin-users-grid"></div>
+                    </div>
+                    <div class="card" id="add-user-card" style="display:none">
+                        <div class="card-header"><div class="card-title">Yangi Foydalanuvchi</div></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end">
+                            <div><div class="f-label">Login</div><input class="f-input" id="new-user-login" placeholder="login" style="margin-bottom:0"></div>
+                            <div><div class="f-label">Parol</div><input class="f-input" id="new-user-pass" placeholder="parol" style="margin-bottom:0"></div>
+                            <div><div class="f-label">Telegram ID</div><input class="f-input" id="new-user-tgid" placeholder="123456789" style="margin-bottom:0"></div>
+                            <div><div class="f-label">Daraja</div><select class="f-select" id="new-user-role" style="margin-bottom:0"><option value="free">Free</option><option value="pro">Pro</option><option value="pro+">Pro+</option></select></div>
+                        </div>
+                        <div style="margin-top:16px;display:flex;gap:8px">
+                            <button class="btn btn-primary btn-sm" onclick="Admin.addUser()">SAQLASH</button>
+                            <button class="btn btn-outline btn-sm" onclick="document.getElementById('add-user-card').style.display='none'">BEKOR</button>
+                        </div>
+                        <div class="success-msg" id="add-user-msg"></div>
+                    </div>
+                    <div class="card mt-16">
+                        <div class="card-header"><div><div class="card-title">📊 Tizim Statistikasi</div></div></div>
+                        <div class="stats-grid" style="margin-bottom:0">
+                            <div class="stat-card accent"><div class="stat-icon">👥</div><div class="stat-label">Foydalanuvchilar</div><div class="stat-value" id="admin-total-users">0</div></div>
+                            <div class="stat-card green-card"><div class="stat-icon">✅</div><div class="stat-label">Aktiv</div><div class="stat-value" id="admin-active-users">0</div></div>
+                            <div class="stat-card orange-card"><div class="stat-icon">⭐</div><div class="stat-label">Pro / Pro+</div><div class="stat-value" id="admin-paid-users">0</div></div>
+                            <div class="stat-card red-card"><div class="stat-icon">📝</div><div class="stat-label">Jami Yozuvlar</div><div class="stat-value" id="admin-total-records">0</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== MIN QOLDIQ TAB ===== -->
+                <div class="tab-panel" id="tab-minqoldiq">
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title" data-i18n="minQoldiqLimit">📉 Minimum Qoldiq Limitlari</div>
+                                <div class="card-subtitle" data-i18n="minQoldiqSubtitle">Mahsulot qoldig'i bu limitdan pastga tushganda ogohlantirish beradi</div>
+                            </div>
+                            <select class="f-select" id="minq-obyekt-filter" onchange="MinQoldiq.render()" style="margin-bottom:0;min-width:160px">
+                                <option value="Barchasi" data-i18n="barchasi">Barchasi</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; gap:8px; margin-bottom:16px; align-items:center;">
+                            <input class="f-input" id="minq-search" placeholder="Mahsulot qidirish..." data-i18n="mahsulotQidirish" style="margin-bottom:0; flex:1;" oninput="MinQoldiq.render()">
+                            <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; padding: 0 8px;">
+                                <input type="checkbox" id="minq-only-red" onchange="MinQoldiq.render()" style="width:auto; margin:0;">
+                                <span style="color:var(--red); font-weight:600;">Faqat kamayganlar</span>
+                            </label>
+                        </div>
+                        <div id="minq-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
+                </div>
+
+                <!-- ===== SOZLAMALAR TAB ===== -->
+                <div class="tab-panel" id="tab-settings">
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-title" style="margin-bottom:16px">🎨 <span data-i18n="tema">Tema</span></div>
+                            <div style="display:flex;gap:10px">
+                                <button class="btn btn-sm" onclick="App.setTheme('dark')" id="btn-theme-dark" style="flex:1;background:var(--accent-dim);color:var(--accent-light);border:1px solid rgba(99,102,241,0.2)" data-i18n="qora">🌙 Qora</button>
+                                <button class="btn btn-sm" onclick="App.setTheme('light')" id="btn-theme-light" style="flex:1;background:rgba(255,255,255,0.03);color:var(--text-secondary);border:1px solid var(--border)" data-i18n="oq">☀️ Oq</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title" style="margin-bottom:16px">🌐 <span data-i18n="til">Til</span></div>
+                            <div style="display:flex;gap:10px">
+                                <button class="btn btn-sm" onclick="App.setLang('uz')" id="btn-lang-uz" style="flex:1">O'zbekcha</button>
+                                <button class="btn btn-sm" onclick="App.setLang('ru')" id="btn-lang-ru" style="flex:1">Русский</button>
+                                <button class="btn btn-sm" onclick="App.setLang('en')" id="btn-lang-en" style="flex:1">English</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title" style="margin-bottom:16px" data-i18n="tizim">ℹ️ Tizim</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                                <div><div class="f-label" data-i18n="versiya">Versiya</div><div style="font-size:14px;font-weight:600;color:var(--accent-light)">v3.7 Pro+</div></div>
+                                <div><div class="f-label" data-i18n="backend">Backend</div><div style="font-size:14px;font-weight:600;color:var(--green)">Node.js</div></div>
+                                <div><div class="f-label" data-i18n="foydalanuvchi">Foydalanuvchi</div><div style="font-size:14px;font-weight:600" id="settings-user">—</div></div>
+                                <div><div class="f-label" data-i18n="daraja">Daraja</div><div style="font-size:18px;font-weight:700" id="premium-status">FREE</div></div>
+                            </div>
+                        </div>
+
+                        <div class="card settings-full mb-16" id="admin-obyekt-section" style="display:none">
+                            <div class="card-title" style="margin-bottom:16px" data-i18n="obyektBoshqarish">🏢 Obyektlarni Boshqarish</div>
+                            <div style="display:flex; gap:8px; margin-bottom:16px">
+                                <input class="f-input" id="new-obyekt-name" placeholder="Yangi obyekt nomi..." data-i18n="yangiObyekt" style="margin-bottom:0; flex:1;">
+                                <button class="btn btn-green btn-sm" onclick="Settings.addObyekt()" data-i18n="qoshishBtn">QO'SHISH</button>
+                            </div>
+                            <div id="settings-obyektlar-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        </div>
+
+                        <div class="card settings-full mb-16" id="admin-ombor-section" style="display:none">
+                            <div class="card-title" style="margin-bottom:16px" data-i18n="omborBoshqarish">🏭 Omborlarni Boshqarish</div>
+                            <div style="display:flex; gap:8px; margin-bottom:16px">
+                                <input class="f-input" id="new-ombor-name" placeholder="Yangi ombor nomi..." data-i18n="yangiOmbor" style="margin-bottom:0; flex:1;">
+                                <button class="btn btn-green btn-sm" onclick="Settings.addOmbor()" data-i18n="qoshishBtn">QO'SHISH</button>
+                            </div>
+                            <div id="settings-omborlar-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        </div>
+
+                        <!-- Katalog va Firmalar -->
+                        <div class="card settings-full mb-16">
+                            <div class="card-title" style="margin-bottom:16px" data-i18n="katalogBoshqarish">📚 Katalog Boshqaruvi (Mahsulotlar)</div>
+                            <div style="display:flex; gap:8px; margin-bottom:16px">
+                                <input class="f-input" id="katalog-search" placeholder="Mahsulot nomini qidiring (tahrirlash yoki o'chirish uchun)..." data-i18n="mahsulotQidirish" style="margin-bottom:0; flex:1;" oninput="Settings.renderKatalogSearchResults()">
+                                <button class="btn btn-green btn-sm" onclick="Settings.showAddKatalog()" data-i18n="yangiMahsulot">+ Yangi</button>
+                                <button class="btn btn-outline btn-sm" onclick="Settings.showImportKatalog()" data-i18n="csvImport">📥 Import</button>
+                            </div>
+                            <div id="settings-katalog-list" style="display:flex; flex-direction:column; gap:8px;">
+                                <div class="empty-state-text" style="font-size:12px;text-align:center;color:var(--text-muted)" data-i18n="qidirish">Qidirish uchun matn kiriting...</div>
+                            </div>
+                            <!-- Mahsulot qoshish/tahrirlash modali -->
+                            <div id="katalog-edit-form" style="display:none; background:var(--bg-card); padding:16px; border-radius:8px; margin-top:16px; border:1px solid var(--border-light)">
+                                <div style="font-weight:600; margin-bottom:12px" id="katalog-form-title" data-i18n="qoshish">Mahsulot qo'shish</div>
+                                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px;">
+                                    <div><div class="f-label" data-i18n="nomi">Nomi</div><input class="f-input" id="kat-form-nom"></div>
+                                    <div><div class="f-label" data-i18n="olchov">O'lchov</div><input class="f-input" id="kat-form-olv" placeholder="dona, kg..."></div>
+                                </div>
+                                <input type="hidden" id="kat-form-old-nom">
+                                <div style="display:flex; gap:8px; margin-top:12px;">
+                                    <button class="btn btn-primary btn-sm" onclick="Settings.saveKatalogItem()" data-i18n="saqlash">Saqlash</button>
+                                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('katalog-edit-form').style.display='none'" data-i18n="bekorQilish">Bekor qilish</button>
+                                </div>
+                            </div>
+                            <!-- Katalog Import modali -->
+                            <div id="katalog-import-form" style="display:none; background:var(--bg-card); padding:16px; border-radius:8px; margin-top:16px; border:1px solid var(--border-light)">
+                                <div style="font-weight:600; margin-bottom:12px">📥 Mahsulotlarni Import Qilish</div>
+                                <div style="margin-bottom:12px">
+                                    <div class="f-label">Faylni tanlang (CSV, XLS, XLSX - A: Nomi, B: O'lchov birligi)</div>
+                                    <input type="file" id="kat-import-file" accept=".csv,.txt,.xls,.xlsx" style="width:100%; padding:10px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text)">
+                                </div>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn btn-primary btn-sm" onclick="Settings.importKatalog()">Import Qilish</button>
+                                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('katalog-import-form').style.display='none'">Bekor qilish</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Firmalar Boshqaruv -->
+                        <div class="card settings-full mb-16">
+                            <div class="card-title" style="margin-bottom:16px" data-i18n="firmalarBoshqarish">🏢 Firmalar Boshqaruvi</div>
+                            <div style="display:flex; gap:8px; margin-bottom:16px">
+                                <input class="f-input" id="firma-search" placeholder="Firma nomini qidiring..." data-i18n="firmaQidirish" style="margin-bottom:0; flex:1;" oninput="Settings.renderFirmalarSearchResults()">
+                                <button class="btn btn-green btn-sm" onclick="Settings.showAddFirma()">+ <span data-i18n="yangiMahsulot">Yangi</span></button>
+                                <button class="btn btn-outline btn-sm" onclick="Settings.showImportFirma()" data-i18n="csvImport">📥 Import</button>
+                            </div>
+                            <div id="settings-firmalar-list" style="display:flex; flex-direction:column; gap:8px;">
+                                <div class="empty-state-text" style="font-size:12px;text-align:center;color:var(--text-muted)" data-i18n="qidirish">Qidirish uchun matn kiriting...</div>
+                            </div>
+                            <!-- Firma qoshish/tahrirlash modali -->
+                            <div id="firma-edit-form" style="display:none; background:var(--bg-card); padding:16px; border-radius:8px; margin-top:16px; border:1px solid var(--border-light)">
+                                <div style="font-weight:600; margin-bottom:12px" id="firma-form-title" data-i18n="qoshish">Firma qo'shish</div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                    <div><div class="f-label" data-i18n="firma">Firma nomi</div><input class="f-input" id="frm-form-nom"></div>
+                                    <div><div class="f-label" data-i18n="teleron">Telefon</div><input class="f-input" id="frm-form-phone" placeholder="+998..."></div>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                    <div><div class="f-label" data-i18n="manzil">Manzil</div><input class="f-input" id="frm-form-address" placeholder="Toshkent..."></div>
+                                    <div><div class="f-label" data-i18n="inn">INN</div><input class="f-input" id="frm-form-inn" placeholder="123456789"></div>
+                                </div>
+                                <input type="hidden" id="frm-form-old-nom">
+                                <div style="display:flex; gap:8px; margin-top:12px;">
+                                    <button class="btn btn-primary btn-sm" onclick="Settings.saveFirmaItem()" data-i18n="saqlash">Saqlash</button>
+                                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('firma-edit-form').style.display='none'" data-i18n="bekorQilish">Bekor qilish</button>
+                                </div>
+                            </div>
+                            <!-- Import modali -->
+                            <div id="firma-import-form" style="display:none; background:var(--bg-card); padding:16px; border-radius:8px; margin-top:16px; border:1px solid var(--border-light)">
+                                <div style="font-weight:600; margin-bottom:12px" data-i18n="csvImport">📥 Firmalarni Import Qilish</div>
+                                <div style="margin-bottom:12px">
+                                    <div class="f-label" data-i18n="csvFormat">Faylni tanlang (CSV, XLS, XLSX - ustunlar: nom, telefon, manzil, inn)</div>
+                                    <input type="file" id="frm-import-file" accept=".csv,.txt,.xls,.xlsx" style="width:100%; padding:10px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text)">
+                                </div>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn btn-primary btn-sm" onclick="Settings.importFirmalar()" data-i18n="csvImport">Import Qilish</button>
+                                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('firma-import-form').style.display='none'">Bekor qilish</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Modules -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/charts.js"></script>
+    <script src="/js/kirim-chiqim.js"></script>
+    <script src="/js/qoldiq.js"></script>
+    <script src="/js/jurnal.js"></script>
+    <script src="/js/reports.js"></script>
+    <script src="/js/admin.js"></script>
+    <script src="/js/settings.js"></script>
+    <script src="/js/warehouse.js"></script>
+    <script src="/js/moliya.js"></script>
+    <script src="/js/minqoldiq.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
