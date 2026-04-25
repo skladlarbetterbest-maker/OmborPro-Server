@@ -1,0 +1,147 @@
+══════════════════════════════════════════════════════════════════════
+  OmborPro v3.8 — To'liq Yakuniy Loyiha Hujjati va Qo'llanma
+  Oxirgi yangilanish: 2026-04-20
+══════════════════════════════════════════════════════════════════════
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║  1. UMUMIY MA'LUMOT                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+OmborPro — bu to'liq avtomatlashtirilgan, zamonaviy ombor boshqaruv tizimi. 
+Eski bitta faylli (ProOmbor.html) va JSON fayllarga asoslangan tizimdan, 
+haqiqiy va ishonchli PostgreSQL ma'lumotlar bazasiga o'tkazildi.
+
+Tariflar:
+  - FREE  → asosiy funksiyalar (kirim/chiqim, qoldiq, jurnal)
+  - PRO   → hisobotlar, moliya, filtrlash
+  - PRO+  → chartlar, AI tahlil, to'liq analitika
+  - ADMIN → hammasi + foydalanuvchilarni boshqarish
+
+Yangi Qo'shimchalar:
+  - PostgreSQL Bazaga o'tildi: Ma'lumotlar endi xavfsiz va ishonchli saqlanadi.
+  - Obyektlar Izolyatsiyasi (RBAC): Admin bo'lmaganlar faqat o'z obyektidagi ma'lumotlarni ko'radi.
+  - Telefon Inventarizatsiya: Buxgalter telefon orqali maxsus link bilan ishlaydi.
+  - Animatsiyalar: Zamonaviy va silliq foydalanuvchi interfeysi (UI).
+  - Tahrirlash tarixi: Kim qachon nimani tahrirlagani / o'chirgani bazada aniq saqlanadi.
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║  2. PAPKALAR TUZILISHI                                                  ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+OmborPro - Copy/
+└── node uchun/                ← ASOSIY PAPKA
+    ├── package.json           ← Kutubxonalar va loyiha sozlamalari
+    ├── server.js              ← Asosiy Express server (localIP ni ham topib beradi)
+    ├── store.js               ← Ma'lumotlar bazasi (PostgreSQL) bilan bevosita ishlash kodi
+    ├── setup.sql              ← PostgreSQL bazasini noldan ko'tarish uchun SQL kodlar
+    ├── migrate_data.js        ← (Eski) JSON ma'lumotlarni bazaga ko'chirish skripti
+    │
+    ├── middleware/
+    │   └── auth.js            ← JWT token va huquqlarni (Admin/Obyekt) tekshiradi
+    │
+    ├── routes/                ← API yo'llari (Backend funksiyalari)
+    │   ├── auth.js           ← Login / Logout
+    │   ├── bootstrap.js      ← Sahifa ochilganda barcha ma'lumotlarni birdaniga yuborish
+    │   ├── journal.js        ← Kirim/Chiqim CRUD (Yaratish, O'qish, Tahrirlash, O'chirish)
+    │   ├── products.js       ← Mahsulotlar katalogi bilan ishlash
+    │   ├── users.js          ← Foydalanuvchilarni boshqarish (Admin uchun)
+    │   ├── reports.js        ← Hisobot va statistika
+    │   ├── settings.js       ← Sozlamalar, Obyektlar, Omborlar, Firmalar
+    │   └── warehouse.js      ← Transfer, Inventarizatsiya, Moliya va Telefon inventarizatsiyasi
+    │
+    └── public/                ← Frontend (Saytning ko'rinishi va interaktiv qismi)
+        ├── index.html         ← Asosiy HTML (Dashboard)
+        ├── inventar-mobile.html ← Telefon orqali inventarizatsiya qilish sahifasi
+        ├── css/
+        │   └── style.css      ← Dizayn va animatsiyalar
+        └── js/
+            ├── app.js         ← Asosiy JS (Tizimga kirish, til almashtirish, sahifalar aro o'tish)
+            ├── api.js         ← Serverga (Backendga) so'rovlarni jo'natuvchi funksiyalar
+            ├── utils.js       ← Sanalarni to'g'rilash, raqamlarni formatlash
+            ├── kirim-chiqim.js← Kirim va Chiqim formasi
+            ├── qoldiq.js      ← Qoldiq jadvalini chiqarish va XLS export
+            ├── jurnal.js      ← Yozuvlar jurnali, tarix va tahrirlash (Accordion tizimi)
+            ├── warehouse.js   ← Inventarizatsiya va Transfer logiclari
+            └── ... (boshqa JS fayllar)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║  3. MA'LUMOTLAR BAZASI (POSTGRESQL) BILAN ISHLASH                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+Diqqat: Eski JSON fayllar (data/ papkasi) endi kerak emas, barcha ma'lumotlar bazaga o'tdi.
+Endi ma'lumotlaringiz xavfsiz va tizim tezroq ishlaydi.
+
+1. Bazani sozlash (Agar noldan o'rnatilayotgan bo'lsa):
+   - Kompyuteringizga PostgreSQL o'rnatilgan bo'lishi kerak.
+   - pgAdmin yoki psql orqali "omborpro" degan yangi DataBase (Baza) yarating.
+   - Parolingizni (masalan "0") va foydalanuvchi nomini (masalan "postgres") 
+     node uchun/store.js faylining yuqori qismidagi hovuz (Pool) sozlamalariga to'g'rilab yozing:
+     
+     const pool = new Pool({
+       user: 'postgres',
+       host: 'localhost',
+       database: 'omborpro',
+       password: '0',  // O'z parolingiz
+       port: 5432
+     });
+
+2. Jadvallarni yaratish (Yangi serverda):
+   - "node uchun/setup.sql" faylidagi barcha SQL kodlarni nusxalab,
+   - pgAdmin ichidagi Query Tool orqali "omborpro" bazasiga Run (Ishga tushirish) qiling.
+   - Barcha kerakli jadvallar va ustunlar o'z-o'zidan yaratiladi.
+
+3. Ma'lumotlarni qanday tozalash yoki format qilish mumkin?
+   - Agar barcha ma'lumotlarni tozalab tashlamoqchi bo'lsangiz, pgAdmin da Query Tool ochib quyidagi buyruqni bering:
+     TRUNCATE TABLE jurnal, history, katalog, firms, obyektlar, omborlar, transfers, inventarizatsiya, inv_links, debtors, creditors, payments RESTART IDENTITY CASCADE;
+   - Bu foydalanuvchilar (users) dan tashqari hamma narsani tozalaydi.
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║  4. TIZIMNI ISHGA TUSHIRISH VA SERVERGA QO'YISH (DEPLOY)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+LOCAL (O'Z KOMPYUTERINGIZDA) ISHGA TUSHIRISH:
+  1. Terminalni (yoki CMD) ochib "node uchun" papkasiga kiring:
+     cd "c:\Users\jamol\Desktop\code\opencode2\OmborPro - Copy\node uchun"
+  2. Faqat birinchi marta paketlarni o'rnatish uchun:
+     npm install
+  3. Serverni ishga tushirish:
+     node server.js
+  4. Brauzerni ochib kirish: http://localhost:3000
+  5. Parol: jamoliddin / 122 (yoki o'zingiz kiritgan)
+
+SERVERGA QO'YISH (VPS / HOSTING YOXUD TARMOQ):
+  Agar siz dasturni real ishchi serverga (masalan, Ubuntu VPS) qo'ymoqchi bo'lsangiz:
+  1. Serverga Node.js va PostgreSQL o'rnating.
+  2. "omborpro" bazasini yarating va "setup.sql" ni ishga tushiring.
+  3. Loyihani (node uchun papkasini) serverga yuklang.
+  4. `store.js` dagi parol va user'ni serverdagi postgres ma'lumotlariga moslang.
+  5. `npm install` qiling.
+  6. Tizim to'xtab qolmasligi uchun PM2 orqali ishga tushiring:
+     - npm install -g pm2
+     - pm2 start server.js --name "OmborPro"
+  7. Tizim endi serveringizning IP manzili va 3000 porti orqali (http://IP_MANZIL:3000) tun-u kun ishlaydi.
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║  5. MUHIM FUNKSIYALAR VA YANGILIKLAR                                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+- FIFO (First In First Out) Algoritmi:
+  Kirim qilingan narxlar tarixiga qarab, chiqim qilinayotganda qoldiqning haqiqiy 
+  o'rtacha narxini aniq hisoblab beradi (computeQoldiq() store.js da).
+
+- Inventarizatsiya yoyilmasi (Accordion):
+  Inventarizatsiya tarixida ko'rish tugmasini bossangiz, farqlar 
+  alohida panelda emas, o'sha qatorning tagida silliq ochilib ko'rsatiladi.
+
+- RBAC Huquqlari:
+  Yangi user qo'shganda, unga faqat bitta obyektni (masalan "Abyekt 1") 
+  biriktirib qo'ysangiz, u boshqa obyektning jurnalini ham, qoldig'ini ham ko'ra olmaydi.
+  Yangi firma qo'shish va Tarixni o'qish imkoniyati esa faqat ADMIN uchun ishlaydi.
+
+- Eski JSON "data" papkasi endi butunlay xavfsiz o'chirilishi mumkin, chunki
+  "migrate_data.js" orqali barcha ma'lumotlar muvaffaqiyatli ravishda bazaga yozildi.
+
+MUVAFFAQIYAT! Tizim to'liq barqaror holatda. Hech qanday miltillash (flicker) yoki ulanish xatolari yo'q.
