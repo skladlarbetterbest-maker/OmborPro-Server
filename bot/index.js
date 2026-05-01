@@ -8,6 +8,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const store = require('../store');
 const log = require('../utils/logger')('bot');
+const voice = require('./voice');
 
 // botId → TelegramBot instance
 const activeBots = new Map();
@@ -59,11 +60,14 @@ function mainMenu(user) {
 
 const HELP_TEXT = `📖 *OmborPro Bot — Buyruqlar*
 
+🎙 *OVOZLI BUYRUQ:* shunchaki ovozli xabar yuboring!
+   Misol: _"Pro Stroydan 50 dona armatura, har biri 25 ming, Obyekt 1 ga kirim"_
+
 🔹 /start — Botni qayta ishga tushirish (kod so'raydi)
 🔹 /dashboard — Asosiy ko'rsatkichlar
 🔹 /report — Hisobot (qoldiqlar)
-🔹 /kirim — Yangi kirim qo'shish
-🔹 /chiqim — Yangi chiqim qo'shish
+🔹 /kirim — Yangi kirim qo'shish (qo'lda)
+🔹 /chiqim — Yangi chiqim qo'shish (qo'lda)
 🔹 /obyekt — Faol obyektni almashtirish
 🔹 /NewFirm — Yangi firma/kontragent qo'shish
 🔹 /NewContragent — /NewFirm sinonimi
@@ -319,6 +323,119 @@ async function sendConfirm(bot, chatId) {
   });
 }
 
+// ─── Voice handler ───
+async function handleVoice(bot, msg) {
+  const chatId = msg.chat.id;
+  const ctx = await getSessionUser(chatId);
+  if (!ctx) {
+    await bot.sendMessage(chatId, '🔒 Avval /start orqali kiring.');
+    return;
+  }
+  if (!voice.isEnabled()) {
+    await bot.sendMessage(chatId, '⚠️ Ovozli buyruqlar hozircha o\'chirilgan (GROQ_API_KEY o\'rnatilmagan).');
+    return;
+  }
+
+  const user = ctx.user;
+  const fileId = (msg.voice && msg.voice.file_id) || (msg.audio && msg.audio.file_id);
+  if (!fileId) {
+    await bot.sendMessage(chatId, '❌ Audio topilmadi.');
+    return;
+  }
+
+  let waitMsg;
+  try {
+    waitMsg = await bot.sendMessage(chatId, '🎙 Eshityapman...');
+    const fileUrl = await bot.getFileLink(fileId);
+
+    // STT
+    const text = await voice.transcribe(fileUrl, msg.voice?.mime_type || 'audio/ogg');
+    if (!text) {
+      await bot.editMessageText('❌ Ovozda matn topilmadi. Qaytadan urinib ko\'ring.', { chat_id: chatId, message_id: waitMsg.message_id });
+      return;
+    }
+    await bot.editMessageText(`✍️ "${text}"\n\n🤖 Tahlil qilyapman...`, { chat_id: chatId, message_id: waitMsg.message_id });
+
+    // Kontekst
+    const products = (await store.getKatalog()).map(p => p.nom);
+    const firms = (await store.getFirms()).map(f => f.name);
+    const obyektsAll = await store.getObyektlar();
+    const allowedObyekts = userObyektList(user).includes('Barchasi') || user.role === 'admin' || user.role === 'owner'
+      ? obyektsAll.filter(o => o !== 'Barchasi')
+      : userObyektList(user);
+
+    // Parser
+    const parsed = await voice.parseTransaction(text, {
+      products, firms, obyekts: allowedObyekts
+    });
+
+    // Ruxsat tekshiruvi
+    if (parsed.obyekt && !canAccessObyekt(user, parsed.obyekt)) {
+      await bot.sendMessage(chatId, `❌ "${parsed.obyekt}" obyektiga ruxsatingiz yo'q.\nSizga ruxsat etilgan: ${allowedObyekts.join(', ')}`);
+      return;
+    }
+
+    // Yetishmayotgan ma'lumotlar
+    if (!parsed.mahsulot || !parsed.miqdor || !parsed.obyekt) {
+      const miss = [];
+      if (!parsed.mahsulot) miss.push('mahsulot');
+      if (!parsed.miqdor) miss.push('miqdor');
+      if (!parsed.obyekt) miss.push('obyekt');
+      await bot.sendMessage(chatId, `⚠️ Ma'lumot yetishmayapti: *${miss.join(', ')}*\n\nQaytadan to'liqroq aytib ko'ring yoki /kirim, /chiqim orqali qo'lda kiriting.`, { parse_mode: 'Markdown' });
+      return;
+    }
+
+    // Mahsulotni katalogda tekshirish
+    const productExists = products.find(p => p.toLowerCase() === parsed.mahsulot.toLowerCase());
+    if (!productExists) {
+      await bot.sendMessage(chatId, `❌ "${parsed.mahsulot}" katalogda yo'q.\n/NewProduct orqali qo'shing.`);
+      return;
+    }
+    parsed.mahsulot = productExists;
+
+    // Tomon (firma) tekshirish
+    if (parsed.tomon) {
+      const firmExists = firms.find(f => f.toLowerCase() === parsed.tomon.toLowerCase());
+      if (firmExists) parsed.tomon = firmExists;
+      else parsed.tomon = ''; // yo'q bo'lsa bo'sh
+    }
+
+    // Obyekt tasdiqlash
+    const obyektExists = obyektsAll.find(o => o.toLowerCase() === parsed.obyekt.toLowerCase());
+    if (!obyektExists) {
+      await bot.sendMessage(chatId, `❌ "${parsed.obyekt}" obyekti yo'q. Mavjud: ${obyektsAll.join(', ')}`);
+      return;
+    }
+    parsed.obyekt = obyektExists;
+
+    // Confirm holatiga o'tkazish (mavjud TR_CONFIRM oqimidan foydalanamiz)
+    await store.upsertTelegramSession(chatId, {
+      state: STATE.TR_CONFIRM,
+      stateData: {
+        tur: parsed.tur,
+        mahsulot: parsed.mahsulot,
+        miqdor: Number(parsed.miqdor),
+        narx: parsed.narx === null || parsed.narx === undefined
+          ? (parsed.tur === 'Chiqim' ? undefined : 0)
+          : Number(parsed.narx),
+        tomon: parsed.tomon || '',
+        obyekt: parsed.obyekt,
+        from_voice: true
+      }
+    });
+    await sendConfirm(bot, chatId);
+  } catch (e) {
+    log.error('Voice handler failed', { chatId, error: e.message, stack: e.stack });
+    try {
+      if (waitMsg) {
+        await bot.editMessageText('❌ Xato: ' + e.message, { chat_id: chatId, message_id: waitMsg.message_id });
+      } else {
+        await bot.sendMessage(chatId, '❌ Xato: ' + e.message);
+      }
+    } catch (_) {}
+  }
+}
+
 // ─── Bot factory ───
 function attachHandlers(bot, botRow) {
   const botId = botRow.id;
@@ -326,6 +443,9 @@ function attachHandlers(bot, botRow) {
   bot.on('polling_error', (err) => {
     log.error('polling_error', { botId, name: botRow.name, error: err.message });
   });
+
+  bot.on('voice', (msg) => handleVoice(bot, msg));
+  bot.on('audio', (msg) => handleVoice(bot, msg));
 
   bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
