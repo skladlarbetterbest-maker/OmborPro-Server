@@ -40,7 +40,7 @@ async function query(text, params) {
   try {
     const res = await client.query(text, params);
     const ms = Date.now() - start;
-    if (ms > 500) log.warn('Slow query', { ms, text: text.slice(0, 120) });
+    if (ms > 1500) log.warn('Slow query', { ms, text: text.slice(0, 120) });
     return res;
   } catch (e) {
     log.error('Query failed', { error: e.message, code: e.code, text: text.slice(0, 200), params: params && params.slice ? params.slice(0, 5) : params });

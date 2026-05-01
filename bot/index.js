@@ -376,10 +376,34 @@ function attachHandlers(bot, botRow) {
             await bot.sendMessage(chatId, '❌ Bunday login yo\'q yoki bloklangan. Qaytadan:');
             return;
           }
-          // Telegram ID ni saqlash
-          await store.upsertUser(login, { telegram_id: String(chatId) });
-          await store.upsertTelegramSession(chatId, { botId, userLogin: login, state: STATE.IDLE, stateData: {} });
-          await bot.sendMessage(chatId, `✅ Xush kelibsiz, *${login}*!`, Object.assign({ parse_mode: 'Markdown' }, mainMenu(u)));
+          // Parol so'rash bosqichi
+          await store.upsertTelegramSession(chatId, { botId, state: 'await_password', stateData: { pendingLogin: login } });
+          await bot.sendMessage(chatId, '🔒 Iltimos, *parol*ingizni kiriting:', { parse_mode: 'Markdown' });
+          return;
+        }
+        if (sess && sess.state === 'await_password') {
+          const pendingLogin = (sess.state_data || {}).pendingLogin;
+          if (!pendingLogin) {
+            await store.upsertTelegramSession(chatId, { botId, state: STATE.AWAIT_CODE, stateData: {} });
+            await bot.sendMessage(chatId, '❌ Sessiya buzildi. /start');
+            return;
+          }
+          const u = await store.getUser(pendingLogin);
+          if (!u || !u.active) {
+            await store.upsertTelegramSession(chatId, { botId, state: STATE.AWAIT_CODE, stateData: {} });
+            await bot.sendMessage(chatId, '❌ Foydalanuvchi topilmadi. /start');
+            return;
+          }
+          if (u.pass !== text) {
+            log.warn('Bot login failed', { login: pendingLogin, chatId });
+            await bot.sendMessage(chatId, '❌ Parol noto\'g\'ri. Qaytadan kiriting (yoki /start):');
+            return;
+          }
+          // Muvaffaqiyatli login
+          await store.upsertUser(pendingLogin, { telegram_id: String(chatId) });
+          await store.upsertTelegramSession(chatId, { botId, userLogin: pendingLogin, state: STATE.IDLE, stateData: {} });
+          log.info('Bot login success', { login: pendingLogin, chatId });
+          await bot.sendMessage(chatId, `✅ Xush kelibsiz, *${pendingLogin}*!`, Object.assign({ parse_mode: 'Markdown' }, mainMenu(u)));
           await bot.sendMessage(chatId, await buildDashboard(u), { parse_mode: 'Markdown' });
           return;
         }
