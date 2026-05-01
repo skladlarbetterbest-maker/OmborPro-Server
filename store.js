@@ -162,6 +162,14 @@ async function initTables() {
   try { await query(`ALTER TABLE jurnal ADD COLUMN IF NOT EXISTS tomon VARCHAR(255)`); } catch(e) {}
   try { await query(`ALTER TABLE jurnal ADD COLUMN IF NOT EXISTS editedby VARCHAR(100)`); } catch(e) {}
   try { await query(`ALTER TABLE jurnal ADD COLUMN IF NOT EXISTS editedat TIMESTAMP`); } catch(e) {}
+  // firms jadvali uchun yetishmayotgan ustunlarni qo'shish (eski bazalar uchun)
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS telegram VARCHAR(100)`); } catch(e) {}
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS inn VARCHAR(50)`); } catch(e) {}
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`); } catch(e) {}
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS address TEXT`); } catch(e) {}
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS note TEXT`); } catch(e) {}
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT true`); } catch(e) {}
+  try { await query(`ALTER TABLE firms ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`); } catch(e) {}
 
   // Seed defaults
   const users = await query('SELECT * FROM users WHERE login = $1', ['jamoliddin']);
