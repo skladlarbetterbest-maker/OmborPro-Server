@@ -93,6 +93,11 @@ const Admin = {
     document.getElementById('admin-active-users').textContent = usersArr.filter(([,d])=>d.active).length;
     document.getElementById('admin-paid-users').textContent = usersArr.filter(([,d])=>d.role==='pro'||d.role==='pro+').length;
     document.getElementById('admin-total-records').textContent = (App.data.jurnal||[]).length;
+
+    // Botlarni yuklash (admin/owner)
+    if (App.isAdmin() || App.isOwner()) {
+      this.loadBots();
+    }
   },
 
   bindGridHandlers() {
@@ -347,5 +352,104 @@ const Admin = {
     } catch (e) {
       alert('Server bilan ulanishda xato!');
     }
+  },
+
+  // ─── TELEGRAM BOTLAR ───
+  bots: [],
+
+  showAddBot() {
+    if (!App.isAdmin() && !App.isOwner()) { alert('Faqat admin/owner uchun!'); return; }
+    document.getElementById('add-bot-card').style.display = 'block';
+  },
+
+  async loadBots() {
+    try {
+      const res = await API.getBots();
+      if (!res.ok) { console.error('loadBots:', res.error); return; }
+      this.bots = res.data || [];
+      this.renderBots();
+    } catch (e) {
+      console.error('loadBots xato:', e);
+    }
+  },
+
+  renderBots() {
+    const grid = document.getElementById('admin-bots-grid');
+    if (!grid) return;
+    if (!this.bots.length) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">🤖 Hozircha botlar yo\'q. "+ Yangi Bot" tugmasini bosing.</div>';
+      return;
+    }
+    grid.innerHTML = this.bots.map(b => `
+      <div class="user-card" data-bot-id="${b.id}">
+        <div class="user-card-header">
+          <div class="user-card-avatar" style="background:linear-gradient(135deg,#0088cc,#229ED9)">🤖</div>
+          <div>
+            <div class="user-card-name">${b.name || 'Bot'}</div>
+            <div class="user-card-id">${b.running ? '🟢 Ishlayapti' : (b.active ? '🟡 Faol (kutmoqda)' : '🔴 O\'chiq')}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin:6px 0">Token: <code>${b.tokenMasked}</code></div>
+        <div style="font-size:11px;color:var(--text-secondary);margin:6px 0">🔑 Kirish kodi: <b>${b.accessCode}</b></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <button class="btn btn-sm ${b.active?'btn-red':'btn-green'}" onclick="Admin.toggleBot('${b.id}', ${!b.active})">${b.active?'🔴 O\'chirish':'🟢 Yoqish'}</button>
+          <button class="btn btn-sm btn-outline" onclick="Admin.changeBotCode('${b.id}')">🔑 Kod</button>
+          <button class="btn btn-sm btn-outline" style="color:var(--red);border-color:var(--red)" onclick="Admin.deleteBot('${b.id}')">🗑 O'chirish</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  async addBot() {
+    const name = document.getElementById('new-bot-name').value.trim() || 'OmborPro Bot';
+    const token = document.getElementById('new-bot-token').value.trim();
+    const accessCode = document.getElementById('new-bot-code').value.trim();
+    if (!token || !accessCode) {
+      Utils.showMsg('add-bot-msg', 'Token va kod kiriting!', 'err');
+      return;
+    }
+    try {
+      const res = await API.addBot({ name, token, accessCode });
+      if (!res.ok) { Utils.showMsg('add-bot-msg', res.error || 'Xato!', 'err'); return; }
+      Utils.showMsg('add-bot-msg', res.warning ? 'Saqlandi (ogohlantirish: ' + res.warning + ')' : 'Bot qo\'shildi va ishga tushdi!', 'ok');
+      document.getElementById('new-bot-name').value = '';
+      document.getElementById('new-bot-token').value = '';
+      document.getElementById('new-bot-code').value = '';
+      setTimeout(() => {
+        document.getElementById('add-bot-card').style.display = 'none';
+        this.loadBots();
+      }, 800);
+    } catch (e) {
+      console.error('addBot xato:', e);
+      Utils.showMsg('add-bot-msg', 'Server xato: ' + e.message, 'err');
+    }
+  },
+
+  async toggleBot(id, active) {
+    try {
+      const res = await API.updateBot(id, { active });
+      if (!res.ok) { alert(res.error || 'Xato!'); return; }
+      this.loadBots();
+    } catch (e) { alert('Server xato!'); }
+  },
+
+  async changeBotCode(id) {
+    const code = prompt('Yangi kirish kodi:');
+    if (!code) return;
+    try {
+      const res = await API.updateBot(id, { accessCode: code });
+      if (!res.ok) { alert(res.error || 'Xato!'); return; }
+      alert('Kod yangilandi!');
+      this.loadBots();
+    } catch (e) { alert('Server xato!'); }
+  },
+
+  async deleteBot(id) {
+    if (!confirm('Bu botni o\'chirishni tasdiqlaysizmi?')) return;
+    try {
+      const res = await API.deleteBot(id);
+      if (!res.ok) { alert(res.error || 'Xato!'); return; }
+      this.loadBots();
+    } catch (e) { alert('Server xato!'); }
   }
 };

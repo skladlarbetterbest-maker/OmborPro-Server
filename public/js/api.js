@@ -107,5 +107,14 @@ const API = {
     return this.get('/api/reports/filtered?' + qs);
   },
   async getLowStock() { return this.get('/api/reports/low-stock'); },
-  async getDebtorSummary() { return this.get('/api/reports/debtor-summary'); }
+  async getDebtorSummary() { return this.get('/api/reports/debtor-summary'); },
+
+  // ── Telegram Bots ──
+  async getBots() { return this.get('/api/telegram/bots'); },
+  async addBot(data) { return this.post('/api/telegram/bots', data); },
+  async updateBot(id, data) { return this.put('/api/telegram/bots/' + id, data); },
+  async deleteBot(id) { return this.del('/api/telegram/bots/' + id); },
+
+  // ── Health ──
+  async health() { return this.get('/api/health'); }
 };

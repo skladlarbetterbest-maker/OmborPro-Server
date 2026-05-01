@@ -3,10 +3,22 @@
  */
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
+const log = require('./utils/logger')('store');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000
+});
+
+pool.on('error', (err) => {
+  log.error('PG pool error', { error: err.message });
+});
+
+pool.on('connect', () => {
+  log.debug('PG client connected');
 });
 
 function uid(prefix = '') {
@@ -23,9 +35,16 @@ function dateUz(d) {
 }
 
 async function query(text, params) {
+  const start = Date.now();
   const client = await pool.connect();
   try {
-    return await client.query(text, params);
+    const res = await client.query(text, params);
+    const ms = Date.now() - start;
+    if (ms > 500) log.warn('Slow query', { ms, text: text.slice(0, 120) });
+    return res;
+  } catch (e) {
+    log.error('Query failed', { error: e.message, code: e.code, text: text.slice(0, 200), params: params && params.slice ? params.slice(0, 5) : params });
+    throw e;
   } finally {
     client.release();
   }
@@ -111,6 +130,29 @@ async function initTables() {
     summa NUMERIC(15,2), izoh TEXT, operator VARCHAR(100), created_at TIMESTAMP DEFAULT NOW()
   )`);
 
+  // Telegram bots — admin panelda qo'shiladigan botlar
+  await query(`CREATE TABLE IF NOT EXISTS telegram_bots (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100),
+    token VARCHAR(255) UNIQUE NOT NULL,
+    access_code VARCHAR(50) NOT NULL,
+    active BOOLEAN DEFAULT true,
+    created_by VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`);
+
+  // Telegram user sessions — bot orqali kirgan userlar
+  await query(`CREATE TABLE IF NOT EXISTS telegram_sessions (
+    chat_id VARCHAR(50) PRIMARY KEY,
+    bot_id VARCHAR(50),
+    user_login VARCHAR(100),
+    state VARCHAR(50) DEFAULT 'idle',
+    state_data JSONB DEFAULT '{}'::jsonb,
+    last_active TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW()
+  )`);
+
   // Migrate existing tables (eski bazalar uchun)
   try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS editedby VARCHAR(100)`); } catch(e) {}
   try { await query(`ALTER TABLE history ADD COLUMN IF NOT EXISTS deletedby VARCHAR(100)`); } catch(e) {}
@@ -138,10 +180,10 @@ async function initTables() {
     if (omborlar.rows.length === 0) await query("INSERT INTO omborlar (name) VALUES ('Barchasi')");
   } catch(e) {}
 
-  console.log('✅ Barcha jadvallar tayyor');
+  log.info('Barcha jadvallar tayyor');
 }
 
-initTables().catch(console.error);
+initTables().catch(e => log.error('initTables failed', { error: e.message, stack: e.stack }));
 
 async function readData(fileName) {
   return null;
@@ -636,7 +678,95 @@ async function deleteHistoryEntry(id) {
   await query('DELETE FROM history WHERE id = $1', [id]);
 }
 
+// ── Telegram Bots ──
+async function getTelegramBots() {
+  const res = await query('SELECT * FROM telegram_bots ORDER BY created_at DESC');
+  return res.rows;
+}
+
+async function getTelegramBot(id) {
+  const res = await query('SELECT * FROM telegram_bots WHERE id = $1', [id]);
+  return res.rows[0] || null;
+}
+
+async function getTelegramBotByToken(token) {
+  const res = await query('SELECT * FROM telegram_bots WHERE token = $1', [token]);
+  return res.rows[0] || null;
+}
+
+async function addTelegramBot({ name, token, accessCode, createdBy }) {
+  const id = uid('TGB');
+  const res = await query(`
+    INSERT INTO telegram_bots (id, name, token, access_code, active, created_by, created_at)
+    VALUES ($1, $2, $3, $4, true, $5, NOW())
+    ON CONFLICT (token) DO UPDATE SET
+      name = EXCLUDED.name,
+      access_code = EXCLUDED.access_code,
+      active = true,
+      updated_at = NOW()
+    RETURNING *
+  `, [id, clean(name || 'Bot'), token, String(accessCode), createdBy || 'system']);
+  return res.rows[0];
+}
+
+async function updateTelegramBot(id, updates) {
+  const fields = []; const values = []; let idx = 1;
+  const allowed = { name: 'name', accessCode: 'access_code', active: 'active' };
+  for (const [key, value] of Object.entries(updates)) {
+    const col = allowed[key];
+    if (!col) continue;
+    fields.push(`${col} = $${idx}`); values.push(value); idx++;
+  }
+  if (!fields.length) return await getTelegramBot(id);
+  fields.push('updated_at = NOW()');
+  values.push(id);
+  const res = await query(`UPDATE telegram_bots SET ${fields.join(', ')} WHERE id = $${idx} RETURNING *`, values);
+  return res.rows[0];
+}
+
+async function deleteTelegramBot(id) {
+  await query('DELETE FROM telegram_bots WHERE id = $1', [id]);
+}
+
+// ── Telegram Sessions ──
+async function getTelegramSession(chatId) {
+  const res = await query('SELECT * FROM telegram_sessions WHERE chat_id = $1', [String(chatId)]);
+  return res.rows[0] || null;
+}
+
+async function upsertTelegramSession(chatId, data) {
+  const existing = await getTelegramSession(chatId) || {};
+  const bot_id = data.botId !== undefined ? data.botId : existing.bot_id;
+  const user_login = data.userLogin !== undefined ? data.userLogin : existing.user_login;
+  const state = data.state !== undefined ? data.state : (existing.state || 'idle');
+  const state_data = data.stateData !== undefined ? data.stateData : (existing.state_data || {});
+  const res = await query(`
+    INSERT INTO telegram_sessions (chat_id, bot_id, user_login, state, state_data, last_active, created_at)
+    VALUES ($1, $2, $3, $4, $5::jsonb, NOW(), NOW())
+    ON CONFLICT (chat_id) DO UPDATE SET
+      bot_id = EXCLUDED.bot_id,
+      user_login = EXCLUDED.user_login,
+      state = EXCLUDED.state,
+      state_data = EXCLUDED.state_data,
+      last_active = NOW()
+    RETURNING *
+  `, [String(chatId), bot_id, user_login, state, JSON.stringify(state_data)]);
+  return res.rows[0];
+}
+
+async function clearTelegramSession(chatId) {
+  await query('DELETE FROM telegram_sessions WHERE chat_id = $1', [String(chatId)]);
+}
+
+async function pingDb() {
+  const res = await query('SELECT NOW() as now');
+  return res.rows[0].now;
+}
+
 module.exports = {
+  pool, query, pingDb,
+  getTelegramBots, getTelegramBot, getTelegramBotByToken, addTelegramBot, updateTelegramBot, deleteTelegramBot,
+  getTelegramSession, upsertTelegramSession, clearTelegramSession,
   readData, writeData, uid, clean, dateUz,
   getUsers, getUser, upsertUser, deleteUser,
   getJurnal, addJurnalEntry, updateJurnalEntry, deleteJurnalEntry,

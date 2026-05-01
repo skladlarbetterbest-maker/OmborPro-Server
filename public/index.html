@@ -776,6 +776,39 @@
                             <div class="stat-card red-card"><div class="stat-icon">📝</div><div class="stat-label">Jami Yozuvlar</div><div class="stat-value" id="admin-total-records">0</div></div>
                         </div>
                     </div>
+
+                    <!-- ===== TELEGRAM BOTLAR ===== -->
+                    <div class="card mt-16">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">🤖 Telegram Botlar</div>
+                                <div class="card-subtitle">BotFather'dan olingan token va kirish kodi orqali bot qo'shing</div>
+                            </div>
+                            <div style="display:flex;gap:8px">
+                                <button class="btn btn-primary btn-sm" onclick="Admin.showAddBot()">+ Yangi Bot</button>
+                                <button class="btn btn-outline btn-sm" onclick="Admin.loadBots()">🔄 Yangilash</button>
+                            </div>
+                        </div>
+                        <div id="admin-bots-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+                    </div>
+
+                    <div class="card mt-16" id="add-bot-card" style="display:none">
+                        <div class="card-header"><div class="card-title">Yangi Telegram Bot</div></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+                            <div><div class="f-label">Bot Nomi</div><input class="f-input" id="new-bot-name" placeholder="OmborPro Bot" style="margin-bottom:0"></div>
+                            <div><div class="f-label">Kirish Kodi (foydalanuvchilarga)</div><input class="f-input" id="new-bot-code" placeholder="masalan: 1234" style="margin-bottom:0"></div>
+                            <div style="grid-column:1/-1"><div class="f-label">Bot Token (BotFather)</div><input class="f-input" id="new-bot-token" placeholder="123456789:ABC-DEF..." style="margin-bottom:0;font-family:monospace"></div>
+                        </div>
+                        <div style="margin-top:16px;display:flex;gap:8px">
+                            <button class="btn btn-primary btn-sm" onclick="Admin.addBot()">SAQLASH VA ISHGA TUSHIRISH</button>
+                            <button class="btn btn-outline btn-sm" onclick="document.getElementById('add-bot-card').style.display='none'">BEKOR</button>
+                        </div>
+                        <div class="success-msg" id="add-bot-msg"></div>
+                        <div style="margin-top:12px;padding:12px;background:var(--bg-secondary);border-radius:8px;font-size:12px;color:var(--text-secondary)">
+                            ℹ️ <b>Yo'riqnoma:</b> @BotFather'da yangi bot yarating, tokenni shu yerga kiriting.
+                            Foydalanuvchilar botga <code>/start</code> berib, kirish kodini kiritadi va o'z OmborPro login'ini bog'laydi.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ===== MIN QOLDIQ TAB ===== -->

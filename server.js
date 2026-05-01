@@ -11,6 +11,16 @@ const morgan = require('morgan');
 const path = require('path');
 const os = require('os');
 const config = require('./config');
+const log = require('./utils/logger')('server');
+const store = require('./store');
+const botMgr = require('./bot');
+
+process.on('uncaughtException', (err) => {
+  log.error('uncaughtException', { error: err.message, stack: err.stack });
+});
+process.on('unhandledRejection', (reason) => {
+  log.error('unhandledRejection', { reason: String(reason) });
+});
 
 function getLocalIP() {
   const nets = os.networkInterfaces();
@@ -69,10 +79,25 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/warehouse', require('./routes/warehouse'));
+app.use('/api/telegram', require('./routes/telegram'));
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, app: 'OmborPro', version: '3.8.0', time: new Date().toISOString() });
+// Health check (kengaytirilgan — DB ulanishi va bot soni)
+app.get('/api/health', async (req, res) => {
+  const out = { ok: true, app: 'OmborPro', version: '3.8.0', time: new Date().toISOString() };
+  try {
+    out.db = { ok: true, now: await store.pingDb() };
+  } catch (e) {
+    out.ok = false;
+    out.db = { ok: false, error: e.message };
+  }
+  out.bots = { active: botMgr.activeBots.size };
+  res.status(out.ok ? 200 : 503).json(out);
+});
+
+// Global API error handler — har qanday tutilmagan xatoni log qiladi
+app.use('/api', (err, req, res, next) => {
+  log.error('Unhandled API error', { url: req.originalUrl, method: req.method, error: err.message, stack: err.stack });
+  res.status(500).json({ ok: false, error: err.message || 'Server xatosi' });
 });
 
 // SPA fallback
@@ -83,8 +108,14 @@ app.get('*', (req, res) => {
 // ── Start ──
 const PORT = config.PORT;
 app.listen(PORT, () => {
+  log.info(`OmborPro v3.8 Server ishga tushdi`, { port: PORT, localIP });
   console.log(`\n  ✅ OmborPro v3.8 Server ishga tushdi`);
   console.log(`  📍 http://localhost:${PORT}`);
   console.log(`  📱 Telefon uchun: http://${localIP}:${PORT}`);
   console.log(`  🕐 ${new Date().toLocaleString('uz-UZ')}\n`);
+
+  // Telegram botlarni init qilish (DB tayyor bo'lishi uchun bir oz kutamiz)
+  setTimeout(() => {
+    botMgr.initAllBots().catch(e => log.error('initAllBots crashed', { error: e.message }));
+  }, 3000);
 });

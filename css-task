@@ -1,0 +1,475 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    OmborPro — CSS DESIGN SPECIFICATION                      ║
+║                            css-task v1.0                                   ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  1. LAYOUT STRUCTURE (Sahifa Tuzilishi)                                    ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ┌──────────┐  ┌─────────────────────────────────────────────────────────┐   │
+│  │          │  │  HEADER                                                │   │
+│  │          │  │  [Title]                        [Date] [Badge]         │   │
+│  │  SIDEBAR │  ├─────────────────────────────────────────────────────────┤   │
+│  │          │  │                                                         │   │
+│  │  Brand   │  │  PAGE CONTENT                                           │   │
+│  │  Nav     │  │  (padding: 28px 32px 40px)                             │   │
+│  │  Items   │  │                                                         │   │
+│  │          │  │  ┌─────────────────────────────────────────────────┐   │   │
+│  │          │  │  │  STATS GRID (4 ustunli grid)                   │   │   │
+│  │          │  │  └─────────────────────────────────────────────────┘   │   │
+│  │          │  │                                                         │   │
+│  │          │  │  ┌────────────────────┐ ┌────────────────────┐        │   │
+│  │          │  │  │  CHART 1 (2fr)    │ │  CHART 2 (1fr)    │        │   │
+│  │          │  │  └────────────────────┘ └────────────────────┘        │   │
+│  │          │  │                                                         │   │
+│  │          │  │  ┌─────────────────────────────────────────────────┐   │   │
+│  │          │  │  │  TABLE / CONTENT CARD                          │   │   │
+│  │          │  │  └─────────────────────────────────────────────────┘   │   │
+│  │          │  │                                                         │   │
+│  ├──────────┤  └─────────────────────────────────────────────────────────┘   │
+│  │  USER    │                                                              │
+│  │  INFO    │                                                              │
+│  └──────────┘                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+LAYOUT SPECIFICATIONS:
+- Sidebar: position:fixed, width: 260px, left:0, top:0, bottom:0
+- Main Content: margin-left: 260px (sidebar width)
+- Header: sticky top, height: 70px, padding: 0 32px
+- Page Content: padding: 28px 32px 40px
+
+RESPONSIVE BREAKPOINTS:
+- max-width: 1200px → stats: 2 ustun
+- max-width: 768px → sidebar: hidden, main: margin-left: 0
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  2. SIDEBAR STRUCTURE (Yon Panel)                                          ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────┐
+│  OmborPro                  │  ← Brand (gradient text)
+│  v3.0 Pro+                 │  ← Version badge
+├────────────────────────────┤
+│  Asosiy                    │  ← Section Label (uppercase, muted)
+│  ┌──────────────────────┐  │
+│  │ 📊 Dashboard         │  │  ← Nav Item (hover: bg change)
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ 📦 Kirim / Chiqim    │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ 📋 Qoldiq           │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ 📜 Jurnal           │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ 🗂️ Tarix            │  │
+│  └──────────────────────┘  │
+├────────────────────────────┤
+│  Skladchi                 │  ← Section Label
+│  ┌──────────────────────┐  │
+│  │ 🔄 Transfer         │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ 📦 Inventarizatsiya │  │
+│  └──────────────────────┘  │
+├────────────────────────────┤
+│  Analitika                │  ← Section Label
+│  ┌──────────────────────┐  │
+│  │ 📈 Hisobotlar  [PRO] │  │  ← Badge (orange)
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ 🎯 Chartlar  [PRO+] │  │  ← Badge (pink)
+│  └──────────────────────┘  │
+├────────────────────────────┤
+│  Buxgalteriya             │  ← Section Label
+│  ┌──────────────────────┐  │
+│  │ 💰 Moliya     [PRO+] │  │
+│  └──────────────────────┘  │
+├────────────────────────────┤
+│  Boshqaruv               │
+│  ┌──────────────────────┐  │
+│  │ 👑 Admin Panel      │  │  ← Faqat admin uchun
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │ ⚙️ Sozlamalar       │  │
+│  └──────────────────────┘  │
+├────────────────────────────┤
+│  ┌──┐ Jamoliddin        │
+│  │JA│ ADMIN       [✕]  │  ← User Avatar + Role + Logout
+│  └──┘                    │
+└────────────────────────────┘
+
+NAV ITEM SPEC:
+- padding: 12px 14px
+- border-radius: 10px (radius-md)
+- hover: background rgba(99,102,241,0.08)
+- active: background accent-dim, color accent-light
+- icon: width:20px, text-align:center, font-size:16px
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  3. MENU ITEMS (Barcha Tabs/Menyular)                                       ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+MENU HIERARCHY:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ASOSIY (Asosiy bo'lim)
+   ├── Dashboard        [📊]     - Statistika, grafiklar, faoliyat
+   ├── Kirim / Chiqim   [📦]     - Mahsulot qo'shish/chetlashtirish
+   ├── Qoldiq          [📋]     - Ombordagi qoldiqlar ro'yxati
+   ├── Jurnal          [📜]     - Barcha operatsiyalar tarixi
+   └── Tarix           [🗂️]     - O'chirilgan yozuvlar
+
+2. SKLADCHI (Skladchi uchun)
+   ├── Transfer         [🔄]      - Obyektlar orasida ko'chirish
+   └── Inventarizatsiya[📦]      - Haqiqiy qoldiqni tekshirish
+
+3. ANALITIKA (PRO/PRO+)
+   ├── Hisobotlar      [📈] [PRO]   - Sana, obyekt, firma bo'yicha
+   └── Chartlar        [🎯] [PRO+]  - Vizual tahlillar
+
+4. BUXGALTERIYA (PRO+)
+   └── Moliya          [💰] [PRO+]  - Debitor, kreditor, to'lovlar
+
+5. BOSHQARUV
+   ├── Admin Panel     [👑]          - Foydalanuvchilar (faqat admin)
+   └── Sozlamalar      [⚙️]          - Tema, til, obyektlar
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  4. COLOR PALETTE (Ranglar)                                                 ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+DARK THEME (Default):
+───────────────────────────────────────────────────────────────────────────────
+Backgrounds:
+  --bg-primary:     #0b0f19      (Asosiy fon - qora ko'k)
+  --bg-secondary:   #111827      (Ikkinchi daraja - quyuq ko'k)
+  --bg-card:        rgba(17, 24, 39, 0.7)  (Cardlar - glass effect)
+  --bg-glass:       rgba(17, 24, 39, 0.55) (Glass morphism)
+  --bg-input:       rgba(31, 41, 55, 0.6)   (Inputlar)
+  --bg-sidebar:     rgba(11, 15, 25, 0.95) (Sidebar)
+
+Accent Colors:
+  --accent:         #6366f1      (Asosiy accent - indigo)
+  --accent-light:   #818cf8      (Yengil accent)
+  --accent-dim:     rgba(99, 102, 241, 0.15) (Dim accent)
+  --accent-glow:    rgba(99, 102, 241, 0.4)  (Glow effect)
+
+Semantic Colors:
+  --green:          #10b981      (Muvaffaqiyat, kirim)
+  --green-light:    #34d399      (Yengil yashil)
+  --green-dim:      rgba(16, 185, 129, 0.12)
+  --red:            #ef4444      (Xato, chiqim)
+  --red-light:       #f87171      (Yengil qizil)
+  --red-dim:         rgba(239, 68, 68, 0.12)
+  --orange:          #f59e0b      (Ogohlantirish, PRO)
+  --orange-dim:      rgba(245, 158, 11, 0.12)
+  --cyan:            #06b6d4      (Info)
+  --cyan-dim:        rgba(6, 182, 212, 0.12)
+  --pink:            #ec4899      (PRO+)
+  --pink-dim:        rgba(236, 72, 153, 0.12)
+
+Text:
+  --text:           #f1f5f9      (Asosiy matn - oq)
+  --text-secondary: #94a3b8      (Ikkinchi daraja)
+  --text-muted:     #475569      (O'chirilgan/muted)
+
+Borders:
+  --border:          rgba(148, 163, 184, 0.08)
+  --border-light:    rgba(148, 163, 184, 0.15)
+
+
+LIGHT THEME:
+───────────────────────────────────────────────────────────────────────────────
+Backgrounds:
+  --bg-primary:     #f5f7fa      (Asosiy fon - oq kulrang)
+  --bg-secondary:    #ffffff      (Ikkinchi daraja - toza oq)
+  --bg-card:        #ffffff      (Cardlar)
+  --bg-input:       #f1f5f9      (Inputlar)
+
+Accent Colors:
+  --accent:         #4f46e5      (Yanada to'q indigo)
+  --accent-light:   #6366f1
+  --accent-dim:     rgba(79, 70, 229, 0.08)
+
+Semantic Colors:
+  --green:          #059669
+  --green-light:    #10b981
+  --red:            #dc2626
+  --orange:         #d97706
+
+Text:
+  --text:           #1e293b      (Qora ko'k)
+  --text-secondary:  #64748b
+  --text-muted:     #94a3b8
+
+Borders:
+  --border:          #e2e8f0
+  --border-light:    #cbd5e1
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  5. COMPONENT STYLES (Komponentlar)                                        ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STAT CARD                                                                  │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ (colored top) │ │
+│  │                                                                       │ │
+│  │  ┌──────────┐                                                        │ │
+│  │  │   📥     │  ← Icon (44x44, border-radius: 16px)                   │ │
+│  │  └──────────┘                                                        │ │
+│  │                                                                       │ │
+│  │  Jami Kirim      ← Label (12px, secondary color)                      │ │
+│  │  123.456        ← Value (28px, bold, colored)                       │ │
+│  │  ↑ 12%          ← Change indicator (badge style)                      │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  Card variants: accent (indigo), red-card, green-card, orange-card            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  CARD                                                                        │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  ┌─────────────────────────┐  ┌─────────────────────────┐              │ │
+│  │  │ Card Title             │  │ Action Button          │              │ │
+│  │  │ Card Subtitle          │  │                        │              │ │
+│  │  └─────────────────────────┘  └─────────────────────────┘              │ │
+│  │                                                                       │ │
+│  │  Content area with padding 24px                                        │ │
+│  │                                                                       │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  Specs: background: var(--bg-card), border-radius: 24px, padding: 24px    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BUTTONS                                                                    │
+│                                                                             │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐                 │
+│  │   PRIMARY      │  │   GREEN       │  │   RED          │                 │
+│  │   (gradient)  │  │   (gradient)  │  │   (gradient)   │                 │
+│  └────────────────┘  └────────────────┘  └────────────────┘                 │
+│                                                                             │
+│  ┌────────────────┐  ┌────────────────┐                                      │
+│  │   OUTLINE      │  │   SMALL       │                                      │
+│  │   (border)    │  │   (padding)   │                                      │
+│  └────────────────┘  └────────────────┘                                      │
+│                                                                             │
+│  Button styles:                                                             │
+│  - .btn-primary: accent-gradient + shadow                                   │
+│  - .btn-green: linear-gradient(135deg, #10b981, #059669)                    │
+│  - .btn-red: linear-gradient(135deg, #ef4444, #dc2626)                     │
+│  - .btn-outline: transparent bg, border, hover:bg accent-dim               │
+│  - .btn-sm: padding 8px 16px, font-size 11px                               │
+│  - .btn-full: width: 100%                                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FORM INPUT                                                                 │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  MAHSULOT NOMI                                                 ▼    │   │
+│  │  ┌───────────────────────────────────────────────────────────────┐    │   │
+│  │  │  Qidirish...                                              │    │   │
+│  │  └───────────────────────────────────────────────────────────────┘    │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  Specs:                                                                     │
+│  - padding: 12px 16px                                                      │
+│  - border-radius: 10px (radius-sm)                                          │
+│  - background: var(--bg-input)                                              │
+│  - border: 1px solid var(--border)                                          │
+│  - focus: border-color accent + box-shadow 3px accent-dim                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TABLE                                                                      │
+│                                                                             │
+│  ┌───┬────────┬────────┬────────┬────────┬────────┬────────┬───────────┐   │
+│  │ # │ Sana   │ Tur    │ Obyekt │Mahsulot│Miqdor  │ Narx   │ Summa     │   │
+│  ├───┼────────┼────────┼────────┼────────┼────────┼────────┼───────────┤   │
+│  │ 1 │ 17.04 │ KIRIM  │ Barcha │ Alma  │ 100    │ 15.000 │ 1.500.000 │   │
+│  ├───┼────────┼────────┼────────┼────────┼────────┼────────┼───────────┤   │
+│  │ 2 │ 17.04 │ CHIQIM │ Barcha │ Alma  │ 50     │ 15.000 │ 750.000   │   │
+│  └───┴────────┴────────┴────────┴────────┴────────┴────────┴───────────┘   │
+│                                                                             │
+│  Table specs:                                                              │
+│  - header: bg rgba(31,41,55,0.3), uppercase text, 11px                    │
+│  - rows: hover bg rgba(99,102,241,0.03)                                    │
+│  - borders: 1px solid var(--border)                                         │
+│  - badges: KIRIM (green), CHIQIM (red) - pill style                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BADGE / TAG                                                                │
+│                                                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐                  │
+│  │  KIRIM   │  │  CHIQIM  │  │   PRO    │  │  PRO+    │                  │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘                  │
+│                                                                             │
+│  Specs: padding 4px 12px, border-radius: 9999px, font-size: 11px         │
+│  - badge-kirim: bg green-dim, color green                                  │
+│  - badge-chiqim: bg red-dim, color red                                    │
+│  - nav-badge.pro: bg orange-dim, color orange                             │
+│  - nav-badge.proplus: bg pink-dim, color pink                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  6. TYPOGRAPHY (Shrift)                                                    ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Font Family:
+  font-family: 'Inter', -apple-system, sans-serif
+
+Font Sizes:
+  - Logo/Brand: 22px, weight: 800 (gradient text)
+  - Card Title: 16px, weight: 700
+  - Nav Item: 14px, weight: 500
+  - Body Text: 13px, weight: 400
+  - Label: 11px, weight: 600, uppercase, letter-spacing: 1px
+  - Stat Value: 28px, weight: 800
+  - Mono: 12px (SF Mono, Cascadia Code, Fira Code)
+
+Letter Spacing:
+  - Labels: 0.5px - 1px (uppercase)
+  - Headings: -0.5px (negative for large text)
+
+Line Height:
+  - Body: 1.6
+  - UI Elements: 1.4
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  7. BORDERS & RADIUS                                                        ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Border Radius:
+  --radius-sm: 10px      (inputs, buttons, small elements)
+  --radius-md: 16px      (nav items, cards)
+  --radius-lg: 24px       (main cards, containers)
+  --radius-xl: 32px       (login card)
+  --radius-full: 9999px   (pills, badges)
+
+Borders:
+  --border: rgba(148, 163, 184, 0.08)     (subtle)
+  --border-light: rgba(148, 163, 184, 0.15) (slightly visible)
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  8. SHADOWS                                                                 ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2)
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.3)
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.4)
+  --shadow-glow: 0 0 30px var(--accent-glow)
+
+Effects:
+  - Card hover: translateY(-2px) + shadow-md
+  - Button hover: translateY(-1px)
+  - Input focus: box-shadow 0 0 0 3px accent-dim
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  9. ANIMATIONS                                                              ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+
+Keyframes:
+  - fadeIn: opacity 0→1, translateY 8px→0 (0.35s)
+  - loginReveal: opacity 0→1, translateY 30px→0, scale 0.96→1 (0.7s)
+  - loaderPulse: opacity 1→0.5→1 (1.5s infinite)
+  - loaderFill: width 0→100% (1.4s)
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  10. SPECIAL SECTIONS                                                       ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+GRADIENT ACCENTS:
+  - Form kirim: linear-gradient(90deg, #10b981, #34d399)
+  - Form chiqim: linear-gradient(90deg, #ef4444, #f87171)
+  - Stat card tops: gradient lines (3px height)
+
+BACKGROUND EFFECTS:
+  - body::before: Multiple radial gradients for depth
+  - Glass morphism on cards: backdrop-filter: blur(12px)
+
+SCROLLBAR:
+  - width: 6px
+  - thumb: var(--text-muted), border-radius: full
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  11. UTILITY CLASSES                                                        ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+  .mb-24 { margin-bottom: 24px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mt-16 { margin-top: 16px; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .empty-state { text-align: center; padding: 48px 24px; }
+  .mono { font-family: monospace; font-size: 12px; }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* QOLDIQ SIDE ITEMS */
+.qoldiq-side-item {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: var(--transition);
+}
+.qoldiq-side-item:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+}
+.qoldiq-side-item .q-name {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.qoldiq-side-item .q-qty {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  12. CSS VARIABLES (Full List)                                              ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+:root {
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 70px;
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+═══════════════════════════════════════════════════════════════════════════════
