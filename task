@@ -1,6 +1,6 @@
 ══════════════════════════════════════════════════════════════════════
-  OmborPro v3.8 — To'liq Yakuniy Loyiha Hujjati va Qo'llanma
-  Oxirgi yangilanish: 2026-04-20
+  OmborPro v3.9 — To'liq Yakuniy Loyiha Hujjati va Qo'llanma
+  Oxirgi yangilanish: 2026-05-01
 ══════════════════════════════════════════════════════════════════════
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -23,6 +23,19 @@ Yangi Qo'shimchalar:
   - Telefon Inventarizatsiya: Buxgalter telefon orqali maxsus link bilan ishlaydi.
   - Animatsiyalar: Zamonaviy va silliq foydalanuvchi interfeysi (UI).
   - Tahrirlash tarixi: Kim qachon nimani tahrirlagani / o'chirgani bazada aniq saqlanadi.
+
+v3.9 dagi YANGILIKLAR (2026-05-01):
+  - Telegram Bot Integratsiyasi: Admin panel orqali cheksiz bot qo'shish mumkin.
+    Har bir bot uchun token va kirish kodi belgilanadi. Foydalanuvchilar
+    bot orqali Kirim/Chiqim qila oladi (RBAC bilan to'liq mos).
+  - Strukturali Logger (utils/logger.js): Render.com loglarida har bir xato
+    [TAG] va vaqt belgisi bilan aniq ko'rinadi. Slow query'lar (>500ms)
+    avtomatik aniqlanadi.
+  - Kengaytirilgan /api/health: DB ulanishi va bot soni real vaqtda ko'rinadi.
+  - Global Error Handler: Server endi hech qanday xatoni yo'qotmaydi —
+    uncaughtException, unhandledRejection va API xatolari log qilinadi.
+  - DB Pool Sozlamalari: Render.com SSL bilan optimal ishlaydi (max 10,
+    timeout 10s, idle 30s).
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
